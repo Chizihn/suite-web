@@ -9,7 +9,7 @@ import {
   MessageCircle,
   Search,
 } from "lucide-react";
-import { useAuthStore } from "../store/authStore";
+import { useWallet } from "../contexts/WalletContext";
 import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 
@@ -33,7 +33,7 @@ const TopicCard: React.FC<TopicCardProps> = ({ icon, title, onClick }) => (
 
 const Help: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { disconnect } = useAuthStore();
+  const { isConnected, disconnect } = useWallet();
   const navigate = useNavigate();
 
   const handleGoBack = () => {

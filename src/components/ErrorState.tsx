@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Button } from "./ui/Button";
 
 interface ErrorStateProps {
@@ -14,23 +14,18 @@ const ErrorState: React.FC<ErrorStateProps> = ({
   className = "",
 }) => {
   return (
-    <div
-      className={`flex flex-col items-center justify-center min-h-[50vh] ${className}`}
-    >
-      <div className="mb-4">
-        <AlertTriangle size={48} className="text-error" />
-      </div>
-      <p className="text-sm text-secondary mb-4 max-w-md text-center">
-        {message}
-      </p>
-      {onRetry && (
-        <Button
-          title="Retry"
-          onClick={onRetry}
-          className="bg-primary text-text-inverse px-6 py-2 rounded-sm"
-        />
+
+
+     <div className={`bg-background-primary min-h-[50vh] flex items-center justify-center p-8 ${className} `}>
+            <div className="text-center">
+              <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
+              <h3 className="mt-4 text-lg font-medium text-text-primary">Something went wrong</h3>
+              <p className="mt-2 text-sm text-text-secondary">{message}</p>
+              {onRetry && (
+        <Button onClick={onRetry} className="mt-6">Try Again</Button>
       )}
-    </div>
+            </div>
+          </div>
   );
 };
 

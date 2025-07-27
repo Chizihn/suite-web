@@ -1,19 +1,17 @@
-"use client"
-
-import type React from "react"
-import { useNavigate } from "react-router-dom"
-import { Settings, Wallet, Bell, HelpCircle, Mail, LogOut, User, ChevronRight, Copy, ExternalLink } from "lucide-react"
-import { useAuthStore } from "../store/authStore"
-import { useSuiWallet } from "../hooks/useSuiWallet"
-import { Card } from "../components/ui/Card"
-import { Button } from "../components/ui/Button"
+import type React from "react";
+import { useNavigate } from "react-router-dom";
+import { Settings, Wallet, Bell, HelpCircle, Mail, LogOut, User, ChevronRight, Copy, ExternalLink } from "lucide-react";
+import { useWallet } from "../contexts/WalletContext";
+import { Card } from "../components/ui/Card";
+import { Button } from "../components/ui/Button";
+import ConnectWallet from "../components/ConnectWallet";
 
 interface ProfileItemProps {
-  icon: React.ReactNode
-  title: string
-  description: string
-  onClick?: () => void
-  isDanger?: boolean
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  onClick?: () => void;
+  isDanger?: boolean;
 }
 
 const ProfileItem: React.FC<ProfileItemProps> = ({ icon, title, description, onClick, isDanger = false }) => (
@@ -36,51 +34,53 @@ const ProfileItem: React.FC<ProfileItemProps> = ({ icon, title, description, onC
     </div>
     <ChevronRight size={16} className="text-text-tertiary flex-shrink-0" />
   </button>
-)
+);
 
 const Profile: React.FC = () => {
-  const { user, disconnect } = useAuthStore()
-  const { address, isConnected } = useSuiWallet()
-  const navigate = useNavigate()
+  const { address, isConnected, disconnect: disconnectWallet } = useWallet();
+  const navigate = useNavigate();
 
   const handleDisconnect = () => {
-    disconnect()
-    navigate("/")
-  }
+    disconnectWallet();
+    navigate("/");
+  };
 
   const copyAddress = () => {
     if (address) {
-      navigator.clipboard.writeText(address)
+      navigator.clipboard.writeText(address);
     }
-  }
+  };
 
   const viewOnExplorer = () => {
     if (address) {
-      window.open(`https://suiexplorer.com/address/${address}`, "_blank")
+      window.open(`https://suiexplorer.com/address/${address}`, "_blank");
     }
+  };
+
+  if (!isConnected) {
+    return (
+      <main className="animate-fade-in">
+
+       <div className="container py-6">
+        <div className="max-w-md mx-auto text-center space-y-6">
+          <div className="w-24 h-24 bg-surface-secondary rounded-full flex items-center justify-center mx-auto">
+            <Wallet size={32} className="text-text-tertiary" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold">Connect Your Wallet</h2>
+            <p className="text-text-secondary">Connect your wallet to access your profile and manage your bookings.</p>
+          </div>
+         <ConnectWallet className="btn-primary" />
+        </div>
+      </div>
+ </main>
+    );
   }
 
-  // if (!isConnected) {
-  //   return (
-  //     <div className="container py-6">
-  //       <div className="max-w-md mx-auto text-center space-y-6">
-  //         <div className="w-24 h-24 bg-surface-secondary rounded-full flex items-center justify-center mx-auto">
-  //           <Wallet size={32} className="text-text-tertiary" />
-  //         </div>
-  //         <div className="space-y-2">
-  //           <h2 className="text-2xl font-bold">Connect Your Wallet</h2>
-  //           <p className="text-text-secondary">Connect your wallet to access your profile and manage your bookings.</p>
-  //         </div>
-  //         <Button onClick={() => navigate("/")} className="mx-auto">
-  //           Connect Wallet
-  //         </Button>
-  //       </div>
-  //     </div>
-  //   )
-  // }
-
   return (
-    <div className="container py-6 space-y-8">
+    <main className="animate-fade-in">
+
+     <div className="container py-6 space-y-8">
       {/* Profile Header */}
       <div className="text-center space-y-4">
         <div className="w-24 h-24 mx-auto rounded-full bg-surface-secondary flex items-center justify-center">
@@ -169,7 +169,8 @@ const Profile: React.FC = () => {
         </Card>
       </div>
     </div>
-  )
-}
+ </main>
+  );
+};
 
-export default Profile
+export default Profile;

@@ -8,7 +8,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onClick }) => {
   return (
     <div
       onClick={onClick}
-      className="cursor-pointer border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition"
+      className="cursor-pointer card overflow-hidden hover:shadow-md transition"
     >
       <img
         src={booking.hotelImage || "https://via.placeholder.com/400x200"}

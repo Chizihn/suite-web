@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import Header from './layouts/Header';
 import Navigation from './layouts/Navigation';
+import Footer from './layouts/Footer';
 
 function App() {
   const location = useLocation();
@@ -17,7 +18,7 @@ function App() {
   const showNavigation = !hideNavOnRoutes.includes(location.pathname);
 
   return (
-    <div className="min-h-screen bg-background-primary text-text-primary flex flex-col">
+    <div className="min-h-screen bg-background-primary text-text-primary flex flex-col mb-[4rem] lg:mb-0">
       <Header />
       
       <main className="flex-1 w-full">
@@ -32,6 +33,7 @@ function App() {
       
       {/* Global notification container */}
       <div id="notifications" className="fixed bottom-20 left-0 right-0 z-50 md:bottom-6 md:left-auto md:right-6 md:max-w-sm" />
+      <Footer />
     </div>
   );
 }

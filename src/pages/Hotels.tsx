@@ -1,39 +1,69 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
-import { Map, AlertCircle, RefreshCcw, Frown, SlidersHorizontal } from "lucide-react"
-import { useAuthStore } from "../store/authStore"
+import {  useLocation } from "react-router-dom"
+import { 
+  Frown, 
+  Filter,
+  LayoutGrid,
+  List,
+  ChevronDown,
+  Map
+} from "lucide-react"
+import { useWallet } from "../contexts/WalletContext";
 import { Button } from "../components/ui/Button"
 import { Modal } from "../components/ui/Modal"
 import { useHotelStore } from "../store/hotelStore"
 import SearchInput from "../components/ui/SearchInput"
 import HotelCard from "../components/ui/HotelCard"
+import ErrorState from "../components/ErrorState"
+import Loading from "../components/Loading"
 
-const PRICE_OPTIONS = ["Any", "Low", "Medium", "High"]
-const AMENITIES = ["Pool", "Free WiFi", "Parking", "Pet-Friendly", "Spa", "Restaurant", "Beach Access"]
+const PRICE_OPTIONS = [
+  { value: "Any", label: "Any Price", range: "" },
+  { value: "Low", label: "Budget", range: "Under 150 $SUI" },
+  { value: "Medium", label: "Mid-range", range: "150-350 $SUI" },
+  { value: "High", label: "Luxury", range: "350+ $SUI" }
+]
+
+const AMENITIES = [
+  "Pool", "Free WiFi", "Parking", "Pet-Friendly", 
+  "Spa", "Restaurant", "Beach Access", "Gym", 
+  "Room Service", "Airport Shuttle", "Business Center", "Laundry"
+]
+
+const SORT_OPTIONS = [
+  { value: "recommended", label: "Recommended" },
+  { value: "price-low", label: "Price: Low to High" },
+  { value: "price-high", label: "Price: High to Low" },
+  { value: "rating", label: "Highest Rated" },
+  { value: "newest", label: "Newest" }
+]
 
 const Hotels: React.FC = () => {
   const { hotels, loading: hotelsLoading, error: hotelsError, fetchHotels } = useHotelStore()
-  const { user } = useAuthStore()
+  const { isConnected } = useWallet();
+  
   const location = useLocation()
+  
   const [activeTab, setActiveTab] = useState<"list" | "map">("list")
-  const [filterModal, setFilterModal] = useState(false)
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const [filterModal, setFilterModal] = useState<boolean>(false)
   const [search, setSearch] = useState("")
   const [appliedSearch, setAppliedSearch] = useState("")
   const [appliedPrice, setAppliedPrice] = useState<string>("Any")
   const [appliedAmenities, setAppliedAmenities] = useState<string[]>([])
+  const [appliedSort, setAppliedSort] = useState<string>("recommended")
   const [modalPrice, setModalPrice] = useState<string>("Any")
   const [modalAmenities, setModalAmenities] = useState<string[]>([])
-  const [searchLoading, setSearchLoading] = useState(false)
+  const [searchLoading, setSearchLoading] = useState<boolean>(false)
+  const [showSortDropdown, setShowSortDropdown] = useState<boolean>(false)
 
   useEffect(() => {
     fetchHotels()
   }, [fetchHotels])
 
-  // Extract query params for initial filter state
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     const category = params.get("category")
@@ -44,35 +74,55 @@ const Hotels: React.FC = () => {
     if (amenity) setAppliedAmenities([amenity])
   }, [location.search])
 
-  // Filter hotels
-  const filteredHotels = hotels.filter((hotel) => {
-    const matchesSearch = !appliedSearch || hotel.name.toLowerCase().includes(appliedSearch.toLowerCase())
-    let matchesPrice = true
-    if (appliedPrice !== "Any") {
-      if (appliedPrice === "Low") matchesPrice = hotel.price <= 150
-      if (appliedPrice === "Medium") matchesPrice = hotel.price > 150 && hotel.price <= 350
-      if (appliedPrice === "High") matchesPrice = hotel.price > 350
+  const getFilteredAndSortedHotels = () => {
+    let filtered = hotels.filter((hotel) => {
+      const matchesSearch = !appliedSearch || 
+        hotel.name.toLowerCase().includes(appliedSearch.toLowerCase()) ||
+        hotel.location?.toLowerCase().includes(appliedSearch.toLowerCase())
+      
+      let matchesPrice = true
+      if (appliedPrice !== "Any") {
+        if (appliedPrice === "Low") matchesPrice = hotel.price <= 150
+        if (appliedPrice === "Medium") matchesPrice = hotel.price > 150 && hotel.price <= 350
+        if (appliedPrice === "High") matchesPrice = hotel.price > 350
+      }
+      
+      const matchesAmenities = appliedAmenities.length === 0 || 
+        appliedAmenities.every((a) => hotel.amenities?.includes(a))
+      
+      return matchesSearch && matchesPrice && matchesAmenities
+    })
+
+    switch (appliedSort) {
+      case "price-low":
+        filtered.sort((a, b) => a.price - b.price)
+        break
+      case "price-high":
+        filtered.sort((a, b) => b.price - a.price)
+        break
+      case "rating":
+        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0))
+        break
+      default:
+        break
     }
-    const matchesAmenities = appliedAmenities.length === 0 || appliedAmenities.every((a) => hotel.amenities.includes(a))
-    return matchesSearch && matchesPrice && matchesAmenities
-  })
+    return filtered
+  }
+
+  const filteredHotels = getFilteredAndSortedHotels()
 
   const handleSearch = () => {
     setSearchLoading(true)
-    setTimeout(() => {
-      setAppliedSearch(search)
-      setSearchLoading(false)
-    }, 800)
+    setAppliedSearch(search)
+    setTimeout(() => setSearchLoading(false), 500)
   }
 
   const handleApplyFilters = () => {
     setSearchLoading(true)
-    setTimeout(() => {
-      setAppliedPrice(modalPrice)
-      setAppliedAmenities(modalAmenities)
-      setFilterModal(false)
-      setSearchLoading(false)
-    }, 800)
+    setAppliedPrice(modalPrice)
+    setAppliedAmenities(modalAmenities)
+    setFilterModal(false)
+    setTimeout(() => setSearchLoading(false), 500)
   }
 
   const openFilterModal = () => {
@@ -81,238 +131,205 @@ const Hotels: React.FC = () => {
     setFilterModal(true)
   }
 
-  // Loading state
+  const clearAllFilters = () => {
+    setSearch("")
+    setAppliedSearch("")
+    setAppliedPrice("Any")
+    setAppliedAmenities([])
+    setAppliedSort("recommended")
+  }
+
+  const activeFiltersCount = () => {
+    let count = 0
+    if (appliedPrice !== "Any") count++
+    if (appliedAmenities.length > 0) count ++
+    return count
+  }
+
   if (hotelsLoading && hotels.length === 0) {
     return (
-      <div className="container py-6">
-        <div className="space-y-6">
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold">Hotels</h1>
-            <p className="text-text-secondary">Find your perfect stay</p>
-          </div>
+      <main className="animate-fade-in">
 
-          <div className="animate-pulse space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="card p-6">
-                <div className="flex gap-4">
-                  <div className="w-24 h-24 bg-surface-secondary rounded-lg"></div>
-                  <div className="flex-1 space-y-3">
-                    <div className="h-5 bg-surface-secondary rounded w-3/4"></div>
-                    <div className="h-4 bg-surface-secondary rounded w-1/2"></div>
-                    <div className="h-4 bg-surface-secondary rounded w-1/3"></div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+<div className=" py-8">
+        <header className="mb-8">
+          <h1 className="text-4xl font-bold tracking-tight text-text-primary">Explore Hotels</h1>
+          <p className="mt-2 text-lg text-text-secondary">Find the perfect place to stay.</p>
+        </header>
+
+        <Loading message="Getting hotels " />
+
         </div>
-      </div>
+      </main>
     )
   }
 
-  // Error state
   if (hotelsError) {
     return (
-      <div className="container py-6">
-        <div className="max-w-md mx-auto text-center space-y-6">
-          <AlertCircle size={48} className="text-error mx-auto" />
-          <div className="space-y-2">
-            <h2 className="text-xl font-bold">Error Loading Hotels</h2>
-            <p className="text-text-secondary">{hotelsError}</p>
-          </div>
-          <Button
-            variant="primary"
-            onClick={() => window.location.reload()}
-            className="flex items-center gap-2 mx-auto"
-          >
-            <RefreshCcw size={16} />
-            Try Again
-          </Button>
-        </div>
+      <div className="min-h-screen flex items-center justify-center p-8" style={{ backgroundColor: 'var(--background-primary)' }}>
+        <ErrorState message={hotelsError} onRetry={() => fetchHotels()} />
       </div>
     )
   }
 
   return (
-    <div className="container py-6 space-y-6">
-      {/* Header */}
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-bold">Hotels</h1>
-            <p className="text-text-secondary">Find your perfect stay</p>
-          </div>
-          {user && (
-            <div className="text-xs bg-surface-secondary px-3 py-1.5 rounded-full text-text-secondary font-mono">
-              {user.address.slice(0, 6)}...{user.address.slice(-4)}
+    <main className="animate-fade-in">
+
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--background-primary)' }}>
+      <div className=" py-8">
+        <header className="mb-8">
+          <h1 className="text-4xl font-bold tracking-tight text-text-primary">Explore Hotels</h1>
+          <p className="mt-2 text-lg text-text-secondary">Find the perfect place to stay.</p>
+        </header>
+
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <SearchInput
+            placeholder="Search by hotel name, location..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            // inputSize="lg"
+            // variant="filled"
+            className="w-full"
+          />
+          <div className="flex gap-2 flex-shrink-0">
+            <Button 
+              onClick={() => isConnected ? openFilterModal() : alert("Please connect your wallet to use filters.")}
+              variant="secondary"
+              className="w-full md:w-auto h-12 text-base px-5 relative"
+            >
+              <Filter size={18} className="mr-2" />
+              Filter
+              {activeFiltersCount() > 0 && (
+                <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-medium text-white">
+                  {activeFiltersCount()}
+                </span>
+              )}
+            </Button>
+            <div className="relative">
+              <Button 
+                onClick={() => setShowSortDropdown(!showSortDropdown)}
+                variant="secondary"
+                className="w-full md:w-auto h-12 text-base px-5"
+              >
+                <span className="mr-2">Sort by: {SORT_OPTIONS.find(o => o.value === appliedSort)?.label}</span>
+                <ChevronDown size={18} />
+              </Button>
+              {showSortDropdown && (
+                <div className="absolute top-full right-0 mt-2 w-56 rounded-lg shadow-lg z-10 bg-surface-secondary p-1">
+                  {SORT_OPTIONS.map(option => (
+                    <a
+                      key={option.value}
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setAppliedSort(option.value)
+                        setShowSortDropdown(false)
+                      }}
+                      className={`block px-3 py-2 text-sm rounded-md ${appliedSort === option.value ? 'font-medium bg-surface-primary text-primary' : 'text-text-primary hover:bg-surface-primary'}`}
+                    >
+                      {option.label}
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-
-        {/* Search Bar */}
-        <div className="flex gap-3">
-          <div className="flex-1">
-            <SearchInput
-              placeholder="Search hotels, locations, or amenities..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            />
           </div>
-          <Button onClick={openFilterModal} variant="secondary" className="flex items-center gap-2">
-            <SlidersHorizontal size={16} />
-            <span className="hidden sm:inline">Filters</span>
-          </Button>
         </div>
-      </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-surface-secondary rounded-lg p-1 w-fit">
-        {["list", "map"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab as "list" | "map")}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors capitalize ${
-              activeTab === tab
-                ? "bg-surface-primary text-text-primary shadow-sm"
-                : "text-text-tertiary hover:text-text-secondary"
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
+        <p className="text-sm text-text-secondary">{filteredHotels.length} results</p>
 
-      {/* Loading Bar */}
-      {(searchLoading || hotelsLoading) && (
-        <div className="space-y-2">
-          <div className="h-1 bg-surface-secondary rounded-full overflow-hidden">
-            <div className="h-full bg-primary/80 animate-pulse w-1/3"></div>
+
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2 p-1 rounded-lg bg-surface-secondary">
+            <Button variant={activeTab === 'list' ? 'primary' : 'ghost'} onClick={() => setActiveTab('list')} className="px-4 py-2 text-sm">List</Button>
+            <Button variant={activeTab === 'map' ? 'primary' : 'ghost'} onClick={() => setActiveTab('map')} className="px-4 py-2 text-sm">Map</Button>
           </div>
-          <p className="text-sm text-text-tertiary text-center">
-            {hotelsLoading ? "Loading hotels..." : "Finding your perfect stay..."}
-          </p>
-        </div>
-      )}
-
-      {/* Content */}
-      {activeTab === "list" ? (
-        <div className="space-y-6">
-          {filteredHotels.length === 0 ? (
-            <div className="text-center py-12 space-y-4">
-              <Frown size={48} className="text-text-tertiary mx-auto" />
-              <div className="space-y-2">
-                <h3 className="text-lg font-medium">No hotels found</h3>
-                <p className="text-text-secondary max-w-md mx-auto">
-                  We couldn't find any hotels matching your search. Try adjusting your filters or search terms.
-                </p>
+          <div className="flex items-center gap-2">
+            {activeTab === 'list' && (
+              <div className="flex items-center gap-1 p-1 rounded-lg bg-surface-secondary">
+                <Button variant={viewMode === 'grid' ? 'primary' : 'ghost'} size="icon" onClick={() => setViewMode('grid')}><LayoutGrid size={20} /></Button>
+                <Button variant={viewMode === 'list' ? 'primary' : 'ghost'} size="icon" onClick={() => setViewMode('list')}><List size={18}/></Button>
               </div>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            )}
+          </div>
+        </div>
+
+        {activeTab === 'list' ? (
+          filteredHotels.length > 0 ? (
+            <div className={`grid gap-6 ${viewMode === 'grid' ? 'md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
               {filteredHotels.map((hotel) => (
-                <HotelCard key={hotel.id} hotel={hotel} />
+                <HotelCard key={hotel.id} hotel={hotel} viewMode={viewMode} />
               ))}
             </div>
-          )}
-        </div>
-      ) : (
-        <div className="text-center py-16 space-y-4">
-          <Map size={48} className="text-text-tertiary mx-auto" />
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium">Map View Coming Soon</h3>
-            <p className="text-text-secondary max-w-sm mx-auto">
-              We're working on bringing you an interactive map to help you find hotels near your destination.
-            </p>
-          </div>
-        </div>
-      )}
+          ) : (
+            <div className="text-center py-20">
+              <Frown size={48} className="mx-auto mb-4 text-text-tertiary" />
+              <h3 className="text-xl font-medium text-text-primary">No hotels found</h3>
+              <p className="mt-2 text-text-secondary">Try adjusting your search or filters.</p>
+              <Button onClick={clearAllFilters} variant="secondary" className="mt-6">Clear All Filters</Button>
+            </div>
+          )
+        ) : (
+           <div className="flex flex-col align-itemx justify-center space-y-4">
+                     <Map size={48} className="text-text-tertiary mx-auto" />
+                     <div className="space-y-2 text-center">
+                       <h3 className="text-lg font-medium">Map View Coming Soon</h3>
+                       <p className="text-text-secondary text-center max-w-sm mx-auto">
+                         We're working on bringing you an interactive map to help you find hotels near your destination.
+                       </p>
+                     </div>
+                   </div>
+        )}
+      </div>
 
-      {/* Filter Modal */}
-      <Modal isOpen={filterModal} title="Filter Hotels" onClose={() => setFilterModal(false)}>
+      <Modal isOpen={filterModal} onClose={() => setFilterModal(false)} title="Filters">
         <div className="space-y-6">
-          {/* Price Filter */}
-          <div className="space-y-3">
-            <h3 className="font-medium">Price Range</h3>
-            <div className="grid grid-cols-4 gap-2">
-              {PRICE_OPTIONS.map((price) => (
+          <div className="space-y-4">
+            <h3 className="font-semibold text-text-primary">Price Range</h3>
+            <div className="grid grid-cols-2 gap-3">
+              {PRICE_OPTIONS.map((option) => (
                 <button
-                  key={price}
-                  onClick={() => setModalPrice(price)}
-                  className={`py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    modalPrice === price
-                      ? "bg-primary text-background-primary"
-                      : "bg-surface-secondary text-text-primary hover:bg-surface-tertiary"
-                  }`}
+                  key={option.value}
+                  onClick={() => setModalPrice(option.value)}
+                  className={`p-4 rounded-lg text-left transition-colors border ${modalPrice === option.value ? 'ring-2 ring-primary border-primary' : 'border-border-primary'}`}
+                  style={{ backgroundColor: modalPrice === option.value ? 'var(--surface-secondary)' : 'var(--surface-primary)' }}
                 >
-                  {price}
+                  <div className="font-medium text-text-primary">{option.label}</div>
+                  {option.range && <div className="text-sm mt-1 text-text-secondary">{option.range}</div>}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Amenities Filter */}
-          <div className="space-y-3">
-            <h3 className="font-medium">Amenities</h3>
-            <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-4">
+            <h3 className="font-semibold text-text-primary">Amenities</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {AMENITIES.map((amenity) => (
                 <button
                   key={amenity}
-                  onClick={() =>
-                    setModalAmenities(
-                      modalAmenities.includes(amenity)
-                        ? modalAmenities.filter((a) => a !== amenity)
-                        : [...modalAmenities, amenity],
-                    )
-                  }
-                  className={`flex items-center justify-between py-2 px-3 rounded-lg text-sm transition-colors ${
-                    modalAmenities.includes(amenity)
-                      ? "bg-primary/10 text-primary border border-primary/20"
-                      : "bg-surface-secondary text-text-primary hover:bg-surface-tertiary border border-border-primary"
-                  }`}
+                  onClick={() => setModalAmenities(prev => prev.includes(amenity) ? prev.filter(a => a !== amenity) : [...prev, amenity])}
+                  className={`flex items-center justify-between p-3 rounded-lg text-sm transition-colors border ${modalAmenities.includes(amenity) ? 'ring-2 ring-primary border-primary' : 'border-border-primary'}`}
+                  style={{ backgroundColor: modalAmenities.includes(amenity) ? 'var(--surface-secondary)' : 'var(--surface-primary)' }}
                 >
-                  <span>{amenity}</span>
-                  <div
-                    className={`w-4 h-4 rounded-sm border flex items-center justify-center ${
-                      modalAmenities.includes(amenity) ? "bg-primary border-primary" : "border-border-primary"
-                    }`}
-                  >
-                    {modalAmenities.includes(amenity) && (
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="M20 6L9 17L4 12"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    )}
+                  <span className={`${modalAmenities.includes(amenity) ? 'text-primary' : 'text-text-primary'}`}>{amenity}</span>
+                  <div className={`w-5 h-5 rounded-md flex items-center justify-center border ${modalAmenities.includes(amenity) ? 'bg-primary border-primary' : 'border-border-primary'}`}>
+                    {modalAmenities.includes(amenity) && <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17L4 12" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                   </div>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setModalPrice("Any")
-                setModalAmenities([])
-              }}
-              className="flex-1"
-            >
-              Reset
-            </Button>
+          <div className="flex gap-3 pt-6 border-t border-border-primary sticky bottom-0 bg-background-primary py-4">
+            <Button variant="secondary" onClick={() => { setModalPrice("Any"); setModalAmenities([]) }} className="flex-1">Reset</Button>
             <Button onClick={handleApplyFilters} className="flex-1" disabled={searchLoading}>
-              {searchLoading ? "Applying..." : "Show Results"}
+              {searchLoading ? "Applying..." : `Show ${filteredHotels.length} Results`}
             </Button>
           </div>
         </div>
       </Modal>
     </div>
+  </main>
   )
 }
 

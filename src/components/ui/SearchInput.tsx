@@ -37,8 +37,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
   }
 
   const variantStyles = {
-    default: "bg-surface-primary border border-border-primary focus:border-primary/50",
-    filled: "bg-surface-secondary border border-transparent focus:border-primary/30",
+    default: "bg-surface-primary border border-gray-700 ",
+    filled: "bg-surface-secondary border border-transparent ",
   }
 
   return (
@@ -50,8 +50,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
       <input
         type="text"
         className={`
-          w-full rounded-lg text-text-primary placeholder-text-tertiary 
-          focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all
+          w-full rounded-md py-6 text-text-primary placeholder-text-tertiary 
+          focus:outline-none  transition-all
           ${variantStyles[variant]} ${sizeStyles[inputSize]} ${inputClassName}
         `}
         {...props}
