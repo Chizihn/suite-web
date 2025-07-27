@@ -1,0 +1,156 @@
+import type { Booking, Hotel, Review } from "../types";
+
+export const mockReviews: Review[] = [
+  {
+    id: "1",
+    userId: "1",
+    userName: "Sophia Clark",
+    userAvatar:
+      "https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=100&h=100&fit=crop&crop=face",
+    rating: 5,
+    likes: 12,
+    dislikes: 1,
+    comment:
+      "Absolutely stunning hotel with exceptional service. The staff went above and beyond to make our stay memorable. Highly recommend!",
+    date: "2 months ago",
+  },
+  {
+    id: "2",
+    userId: "2",
+    userName: "Ethan Carter",
+    userAvatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+    rating: 4,
+    likes: 7,
+    dislikes: 2,
+    comment:
+      "Great location and beautiful rooms. The service was good, but not quite as exceptional as I expected for the price.",
+    date: "3 months ago",
+  },
+];
+
+export const mockHotels: Hotel[] = [
+  {
+    id: "1",
+    name: "The Ritz-Carlton",
+    description:
+      "Luxury hotel in the heart of downtown, offering unparalleled service and amenities.",
+    rating: 4.8,
+    reviewCount: 125,
+    price: 450,
+    images: [
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1595576508898-0ad5c879a061?w=800&h=600&fit=crop",
+    ],
+    amenities: ["Pool", "Free WiFi", "Parking", "Pet-Friendly"],
+    location: "Downtown",
+    reviews: mockReviews,
+  },
+  {
+    id: "2",
+    name: "The Grand Oasis",
+    description:
+      "Luxury resort in the heart of the city, offering unparalleled comfort and service.",
+    rating: 4.9,
+    reviewCount: 89,
+    price: 380,
+    images: [
+      "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&h=600&fit=crop",
+    ],
+    amenities: ["Pool", "Free WiFi", "Spa", "Restaurant"],
+    location: "City Center",
+    reviews: mockReviews,
+  },
+  {
+    id: "3",
+    name: "The Coastal Retreat",
+    description:
+      "Beachfront luxury with stunning ocean views and world-class amenities.",
+    rating: 4.7,
+    reviewCount: 203,
+    price: 520,
+    images: [
+      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=600&fit=crop",
+    ],
+    amenities: ["Pool", "Free WiFi", "Beach Access", "Spa"],
+    location: "Oceanfront",
+    reviews: mockReviews,
+  },
+];
+
+export const mockBookings: Booking[] = [
+  {
+    id: "1",
+    hotelId: "2",
+    hotelName: "The Grand Oasis Resort",
+    hotelImage: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&h=600&fit=crop",
+    roomType: "Oceanfront Suite",
+    checkIn: "Oct 15, 2024",
+    checkOut: "Oct 20, 2024",
+    nights: 5,
+    guests: 2,
+    totalPrice: 530,
+    status: "confirmed",
+    transactionId: "0xabc123...xyz789",
+    nftToken: "QR_CODE_DATA",
+  },
+  {
+    id: "2",
+    hotelId: "3",
+    hotelName: "Mountain View Lodge",
+    hotelImage: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=600&fit=crop",
+    roomType: "Deluxe Room",
+    checkIn: "Nov 02, 2024",
+    checkOut: "Nov 07, 2024",
+    nights: 5,
+    guests: 2,
+    totalPrice: 420,
+    status: "confirmed",
+    transactionId: "0xdef456...abc123",
+  },
+  {
+    id: "3",
+    hotelId: "1",
+    hotelName: "The Ritz-Carlton",
+    hotelImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop",
+    roomType: "Presidential Suite",
+    checkIn: "Dec 10, 2024",
+    checkOut: "Dec 15, 2024",
+    nights: 5,
+    guests: 4,
+    totalPrice: 1200,
+    status: "confirmed",
+    transactionId: "0xghi789...def456",
+    nftToken: "QR_CODE_DATA",
+  },
+  {
+    id: "4",
+    hotelId: "2",
+    hotelName: "The Coastal Retreat",
+    hotelImage: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=600&fit=crop",
+    roomType: "Beach Villa",
+    checkIn: "Jan 20, 2025",
+    checkOut: "Jan 25, 2025",
+    nights: 5,
+    guests: 2,
+    totalPrice: 780,
+    status: "confirmed",
+    transactionId: "0xjkl012...ghi789",
+    nftToken: "QR_CODE_DATA",
+  },
+  {
+    id: "5",
+    hotelId: "3",
+    hotelName: "The Grand Oasis Resort",
+    hotelImage: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&h=600&fit=crop",
+    roomType: "Garden Suite",
+    checkIn: "Feb 14, 2025",
+    checkOut: "Feb 16, 2025",
+    nights: 2,
+    guests: 2,
+    totalPrice: 320,
+    status: "confirmed",
+    transactionId: "0xmno345...jkl012",
+    nftToken: "QR_CODE_DATA",
+  },
+];
