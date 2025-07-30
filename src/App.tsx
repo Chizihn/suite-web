@@ -18,7 +18,7 @@ function App() {
   const showNavigation = !hideNavOnRoutes.includes(location.pathname);
 
   return (
-    <div className="min-h-screen bg-background-primary text-text-primary flex flex-col mb-[4rem] lg:mb-0">
+    <div className="min-h-screen bg-background-primary text-text-primary flex flex-col mb-[6rem] lg:mb-0">
       <Header />
       
       <main className="flex-1 w-full">

@@ -127,14 +127,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
-
-p {
-  margin: 0 0 var(--space-4);
-  color: var(--text-secondary);
-  line-height: var(--leading-relaxed);
-}
-
-
 /* Buttons */
 button {
   display: inline-flex;
@@ -199,8 +191,6 @@ button:disabled {
 .btn-ghost:hover {
   background-color: var(--surface-secondary);
 }
-
-
 
 
 
@@ -351,18 +341,21 @@ button:disabled {
   }
 }
 
+
+/* Suiet package styling */
+
 .wkit-button {
   background-color: var(--primary);
   color: var(--background-primary);
-  font-weight: 600;
+  font-weight: 700;
   width: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius);
-  font-size: var(--text-sm);
+  font-size: var(--text-md);
   line-height: var(--leading-normal);
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   transition: all var(--transition);
   cursor: pointer;
   border: 1px solid transparent;
@@ -413,7 +406,7 @@ button:disabled {
   color: var(--text-primary);
 }
 
-.wkit-select__title {
+.wkit-select__title, .wkit-connecting__description, .wkit-install__description {
   color: var(--text-secondary);
 }
 
@@ -421,9 +414,86 @@ button:disabled {
   color: var(--text-primary);
 }
 
-.wkit-select-item {
+.wkit-select-item, .wkit-connecting__title, .wkit-install__title {
   color: var(--text-primary);
+}
 
+.wkit-install__button {
+  margin-top: 4px;
+}
+/* Connected Wallet Button */
+.wkit-connected-container {
+  font-family: inherit;
+  background: var(--surface-primary);
+padding: 0;
+}
+
+.wkit-connected-button {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 6px 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+}
+
+.wkit-connected-button:hover {
+  background: var(--surface-hover);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.wkit-connected-button:active {
+  
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.wkit-connected-button:hover .wkit-address-select__right-arrow {
+  color: var(--primary);
+  
+  transform: translateX(2px);
+}
+
+.wkit-connected-button:hover .wkit-address-select__address {
+  
+  color: var(--primary);
+}
+
+.wkit-connected-button__balance {
+  display: none; /* Hide SUI balance */
+}
+
+.wkit-connected-button__divider {
+  display: none; /* Hide divider since we're hiding balance */
+}
+
+.wkit-address-select {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wkit-address-select__address {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.wkit-address-select__right-arrow {
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+}
+
+.wkit-address-select__right-arrow svg {
+  width: 16px;
+  height: 16px;
 }
 
 .wkit-select-item:hover {

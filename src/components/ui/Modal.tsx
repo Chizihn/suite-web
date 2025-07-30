@@ -7,6 +7,7 @@ export interface ModalProps {
   onClose: () => void;
   title?: string;
   children: React.ReactNode;
+  className?: string;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -14,18 +15,19 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   title,
   children,
+  className
 }) => {
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center" 
+    <div className={`fixed inset-0 z-50 flex items-end md:items-center justify-center ${className}`} 
          style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}>
       <div 
         className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-t-2xl md:rounded-2xl shadow-2xl animate-fade-in"
         style={{ backgroundColor: 'var(--surface-primary)' }}
       >
         <div 
-          className="sticky top-0 flex justify-between items-center p-6 border-b backdrop-blur-sm"
+          className={`sticky top-0 flex ${title ? "justify-between" : "justify-end"} items-center p-6 border-b backdrop-blur-sm`}
           style={{ 
             backgroundColor: 'var(--surface-primary)',
             borderColor: 'var(--border-primary)'

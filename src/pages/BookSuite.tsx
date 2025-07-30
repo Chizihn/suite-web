@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useHotelStore } from "../store/hotelStore";
 import { useBookingStore } from "../store/bookingStore";
 import { ArrowLeft } from "lucide-react";
@@ -14,24 +14,67 @@ import {
 } from "../utils/booking";
 import Loading from "../components/Loading";
 import Input from "../components/ui/Input";
+import type { Hotel } from "../types/hotel";
 
 const BookSuite: React.FC = () => {
   const navigate = useNavigate();
-  const { selectedHotel } = useHotelStore();
+  const { id } = useParams<{ id: string }>();
+  const { getHotelById } = useHotelStore();
   const { createBooking } = useBookingStore();
+  const [hotel, setHotel] = useState<Hotel | null>(null);
   const [roomType, setRoomType] = useState("");
   const [guests, setGuests] = useState("");
   const [rooms, setRooms] = useState("1");
   const [checkInDate, setCheckInDate] = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
   const [isReviewMode, setIsReviewMode] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!selectedHotel) {
-      navigate("/hotels");
-    }
-  }, [selectedHotel, navigate]);
+    const fetchHotel = async () => {
+      if (!id) {
+        navigate("/hotels");
+        return;
+      }
+      
+      try {
+        const hotelData = await getHotelById(id);
+        if (!hotelData) {
+          throw new Error('Hotel not found');
+        }
+        setHotel(hotelData);
+      } catch (err) {
+        setError('Failed to load hotel details');
+        console.error('Error fetching hotel:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHotel();
+  }, [id, navigate, getHotelById]);
+
+  if (loading) {
+    return <Loading message="Loading details..." />;
+  }
+
+  if (error || !hotel) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center p-6 max-w-md">
+          <h2 className="text-2xl font-bold mb-4">Hotel Not Found</h2>
+          <p className="mb-6">The hotel you're looking for doesn't exist or may have been removed.</p>
+          <button
+            onClick={() => navigate('/hotels')}
+            className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            Browse Hotels
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleNext = () => {
     if (isFormValid()) {
@@ -44,14 +87,15 @@ const BookSuite: React.FC = () => {
   };
 
   const handleConfirmBooking = async () => {
+    if (!hotel) return;
+    
     setLoading(true);
     try {
       const bookingData = {
         id: Date.now().toString(),
-        hotelId: selectedHotel?.id || "",
-        hotelName: selectedHotel?.name || "The Grand Oasis",
-        hotelImage:
-          selectedHotel?.images[0] || "https://via.placeholder.com/100",
+        hotelId: hotel.id,
+        hotelName: hotel.name,
+        hotelImage: hotel.images[0] || "https://via.placeholder.com/100",
         roomType: roomType || "Standard Room",
         checkIn: checkInDate || "Jul 15, 2024",
         checkOut: checkOutDate || "Jul 17, 2024",
@@ -59,11 +103,11 @@ const BookSuite: React.FC = () => {
         nights: getNights(),
         totalPrice: calculateTotalPrice(),
         status: "Confirmed",
-        transactionId: "0xabc123...xyz789",
-        nftToken: "NFT123",
+        transactionId: `0x${Math.random().toString(16).substr(2, 10)}...`,
+        nftToken: `NFT${Math.floor(Math.random() * 10000)}`,
       };
       await createBooking(bookingData);
-      navigate("/hotels/confirmation");
+      navigate(`/booking/${bookingData.id}`);
     } catch (error) {
       console.error("Booking failed:", error);
     } finally {
@@ -80,7 +124,8 @@ const BookSuite: React.FC = () => {
   };
 
   const getSubtotal = () => {
-    const basePrice = selectedHotel?.price || 500;
+    if (!hotel) return 0;
+    const basePrice = hotel.price;
     const nights = getNights();
     return calculateSubtotal(basePrice, nights);
   };
@@ -99,10 +144,6 @@ const BookSuite: React.FC = () => {
     const discount = getDiscount();
     return calculateTotal(subtotal, fees, discount);
   };
-
-  if (!selectedHotel) {
-    return <Loading message="Loading hotel details..." />;
-  }
 
   return (
     <div className="min-h-screen bg-background p-4">
@@ -123,16 +164,16 @@ const BookSuite: React.FC = () => {
           <h3 className="text-h4 text-text-primary mb-3">Your Booking</h3>
           <Card variant="default" className="flex flex-row">
             <img
-              src={selectedHotel.images[0]}
-              alt={selectedHotel.name}
+              src={hotel.images[0]}
+              alt={hotel.name}
               className="w-24 h-24 rounded-md object-cover"
             />
             <div className="p-2">
               <p className="text-h5 text-text-primary mb-1">
-                {selectedHotel.name}
+                {hotel.name}
               </p>
               <p className="text-body2 text-text-secondary">
-                {selectedHotel.location}
+                {hotel.location}
               </p>
             </div>
           </Card>

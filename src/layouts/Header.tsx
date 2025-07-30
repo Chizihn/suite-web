@@ -50,11 +50,12 @@ const Header: React.FC = () => {
               <NavLink
                 key={link.to}
                 to={link.to}
+                end
                 className={({ isActive }) =>
                   `px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
                     isActive 
-                      ? 'text-primary' 
-                      : 'text-text-primary hover:text-primary-dark'
+                      ? 'text-[var(--primary)]' 
+                      : 'text-[var(--text-primary)] dark:text-gray-300 hover:text-[var(--primary)] dark:hover:text-[var(--primary-light)]'
                   }`
                 }
               >

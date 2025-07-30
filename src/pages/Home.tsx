@@ -6,13 +6,13 @@ import HotelCard from '../components/ui/HotelCard';
 
 const Home: React.FC = () => {
 
-  const { hotels, fetchHotels } = useHotelStore();
+  // const { hotels, fetchHotels } = useHotelStore();
   const navigate = useNavigate();
-  const featuredHotels = hotels.slice(0, 4);
+  // const featuredHotels = hotels.slice(0, 4);
 
-  useEffect(() => {
-    fetchHotels();
-  }, [fetchHotels]);
+  // useEffect(() => {
+  //   fetchHotels();
+  // }, [fetchHotels]);
 
 
   return (
@@ -37,7 +37,7 @@ const Home: React.FC = () => {
  
 
       {/* Featured Stays Section */}
-      {featuredHotels.length > 0 && (
+      {/* {featuredHotels.length > 0 && (
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-3xl font-bold mb-2">Featured Stays</h2>
@@ -54,7 +54,7 @@ const Home: React.FC = () => {
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </div>
  </main>
   );

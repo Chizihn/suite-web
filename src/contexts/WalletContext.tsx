@@ -8,18 +8,22 @@ import {
 } from "react";
 import { WalletProvider, useWallet as useSuietWallet } from "@suiet/wallet-kit";
 import "@suiet/wallet-kit/style.css";
+import { formatBalance, SUI_DECIMALS } from "../utils/format";
 
 interface WalletContextType {
   address: string | null;
   isConnected: boolean;
+  isLoading: boolean;
   connect: () => Promise<void>;
   disconnect: () => void;
+  getBalance: () => Promise<string | null>;
 }
 
 const WalletContext = createContext<WalletContextType | null>(null);
 
 function WalletContextContent({ children }: { children: React.ReactNode }) {
   const [address, setAddress] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const wallet = useSuietWallet();
 
   useEffect(() => {
@@ -32,10 +36,12 @@ function WalletContextContent({ children }: { children: React.ReactNode }) {
 
   const connect = async () => {
     try {
-      // The user specified they only use Sui Wallet, so we can default to this.
+      setIsLoading(true);
       await wallet.select("Sui Wallet");
     } catch (error) {
       console.error("Failed to connect wallet:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -47,11 +53,32 @@ function WalletContextContent({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const getBalance = async (): Promise<string | null> => {
+    if (!wallet.connected || !wallet.account?.address) {
+      return null;
+    }
+    try {
+      setIsLoading(true);
+      // @ts-ignore - Sui wallet provider has getBalance method
+      const balance = await wallet.getBalance({
+        coinType: '0x2::sui::SUI'
+      });
+      return balance ? formatBalance(balance.totalBalance, SUI_DECIMALS) : null;
+    } catch (error) {
+      console.error("Error fetching balance:", error);
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const value = {
     address,
     isConnected: wallet.connected,
+    isLoading,
     connect,
     disconnect,
+    getBalance,
   };
 
   return (

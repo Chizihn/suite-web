@@ -32,6 +32,7 @@ import { Button } from "../components/ui/Button";
 import { Modal } from "../components/ui/Modal";
 import type { Hotel, } from "../types";
 import { useWallet } from "../contexts/WalletContext";
+import BookButton from "../components/BookButton";
 
 const HotelDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -87,8 +88,7 @@ const HotelDetails: React.FC = () => {
 
   const handleBookNow = () => {
     if (hotel) {
-      setSelectedHotel(hotel);
-      navigate("/hotels/book");
+      navigate(`/hotels/${hotel.id}/book`);
     }
   };
 
@@ -176,7 +176,7 @@ const HotelDetails: React.FC = () => {
               >
                 <ArrowLeft size={20} style={{ color: 'var(--text-primary)' }} />
               </button>
-              <h1 className="text-lg lg:text-4xl font-semibold truncate max-w-xs sm:max-w-none" style={{ color: 'var(--text-primary)' }}>
+              <h1 className="text-lg lg:text-3xl font-semibold truncate max-w-xs sm:max-w-none" style={{ color: 'var(--text-primary)' }}>
                 {hotel?.name || 'Hotel Details'}
               </h1>
             </div>
@@ -474,7 +474,7 @@ const HotelDetails: React.FC = () => {
             </div>
 
             {/* Transparency Badges */}
-            <div className="rounded-xl p-6 shadow-sm border" style={{ 
+            {/* <div className="rounded-xl p-6 shadow-sm border" style={{ 
               backgroundColor: 'var(--surface-primary)', 
               borderColor: 'var(--border-primary)' 
             }}>
@@ -501,13 +501,13 @@ const HotelDetails: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Booking Sidebar */}
           <div className="lg:col-span-1 mt-8 lg:mt-0">
-            <div className="sticky top-24">
-              <div className="rounded-xl p-6 shadow-lg border" style={{ 
+            <div className="sticky top-24 space-y-8 ">
+              <div className="hidden md:flex flex-col rounded-xl p-6 shadow-lg border" style={{ 
                 backgroundColor: 'var(--surface-primary)', 
                 borderColor: 'var(--border-primary)' 
               }}>
@@ -526,13 +526,42 @@ const HotelDetails: React.FC = () => {
                 
                   disabled={!isConnected}
                 >
-                  {isConnected ? 'Reserve Now' : 'Sign In to Book'}
+                  {isConnected ? 'Reserve Now' : 'Connect your Sui wallet to book'}
                 </Button>
                 
-                <p className="text-xs text-center" style={{ color: 'var(--text-tertiary)' }}>
+                {/* <p className="text-xs text-center" style={{ color: 'var(--text-tertiary)' }}>
                   Free cancellation • No booking fees
-                </p>
+                </p> */}
               </div>
+                {/* Transparency Badges */}
+            <div className="rounded-xl p-6 shadow-sm border" style={{ 
+              backgroundColor: 'var(--surface-primary)', 
+              borderColor: 'var(--border-primary)' 
+            }}>
+              <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Trust & Transparency</h2>
+              <div className="space-y-3">
+                <div className="flex items-center p-4 rounded-lg border" style={{ 
+                  backgroundColor: 'var(--surface-secondary)', 
+                  borderColor: 'var(--border-primary)' 
+                }}>
+                  <ShieldCheck className="w-6 h-6 mr-3" style={{ color: 'var(--success)' }} />
+                  <div>
+                    <p className="font-medium" style={{ color: 'var(--text-primary)' }}>Verified on Sui</p>
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Blockchain verified property</p>
+                  </div>
+                </div>
+                <div className="flex items-center p-4 rounded-lg border" style={{ 
+                  backgroundColor: 'var(--surface-secondary)', 
+                  borderColor: 'var(--border-primary)' 
+                }}>
+                  <Award className="w-6 h-6 mr-3" style={{ color: 'var(--success)' }} />
+                  <div>
+                    <p className="font-medium" style={{ color: 'var(--text-primary)' }}>Certified Excellence</p>
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Quality assurance certified</p>
+                  </div>
+                </div>
+              </div>
+            </div>
             </div>
           </div>
         </div>
@@ -615,6 +644,7 @@ const HotelDetails: React.FC = () => {
           </div>
         </div>
       </Modal>
+      <BookButton isConnected={isConnected} onBook={handleBookNow} /> 
     </div>
   );
 };

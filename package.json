@@ -12,6 +12,8 @@
   "dependencies": {
     "@suiet/wallet-kit": "^0.5.1",
     "@tanstack/react-query": "^5.83.0",
+    "@tanstack/react-query-devtools": "^5.83.0",
+    "axios": "^1.11.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -20,6 +22,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.7.1",
+    "react-toastify": "^11.0.5",
     "zustand": "^5.0.6"
   },
   "devDependencies": {
