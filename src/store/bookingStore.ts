@@ -1,93 +1,45 @@
-import { create } from "zustand";
-import { mockBookings } from "../data";
-import type { Booking } from "../types";
+import { create } from 'zustand';
+import type { Reservation } from '../types';
 
 interface BookingState {
-  bookings: Booking[];
-  savedBookings: Booking[];
-  currentBooking: Booking | null;
+  bookings: Reservation[];
+  currentBooking: Reservation | null;
   loading: boolean;
   error: string | null;
-
-  fetchBookings: () => Promise<void>;
-  createBooking: (
-    bookingData: Omit<Booking, "id" | "status" | "transactionId">
-  ) => Promise<Booking>;
-  setCurrentBooking: (booking: Booking | null) => void;
-  saveBooking: (booking: Booking) => void;
-  removeSavedBooking: (bookingId: string) => void;
-  isBookingSaved: (bookingId: string) => boolean;
+  setBookings: (bookings: Reservation[]) => void;
+  setCurrentBooking: (booking: Reservation | null) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
 }
 
-export const useBookingStore = create<BookingState>((set, get) => ({
+export const useBookingStore = create<BookingState>((set) => ({
   bookings: [],
-  savedBookings: [],
   currentBooking: null,
   loading: false,
   error: null,
 
-  fetchBookings: async () => {
-    set({ loading: true });
-    // Mock API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    if (Math.random() < 0.2) {
-      set({
-        loading: false,
-        error: "Failed to fetch hotels. Please try again.",
-      });
-      return;
-    }
-
-    set({ bookings: mockBookings, loading: false });
-  },
-
-  createBooking: async (bookingData) => {
-    set({ loading: true });
-    // Mock API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    const newBooking: Booking = {
-      ...bookingData,
-      id: Date.now().toString(),
-      status: "confirmed",
-      transactionId: `0x${Math.random()
-        .toString(16)
-        .substr(2, 8)}...${Math.random().toString(16).substr(2, 8)}`,
-      nftToken: "QR_CODE_DATA",
-    };
-    set((state) => ({
-      bookings: [...state.bookings, newBooking],
-      currentBooking: newBooking,
-      loading: false,
-    }));
-    return newBooking;
-  },
-
-  setCurrentBooking: (booking) => set({ currentBooking: booking }),
-
-  saveBooking: (booking) => {
-    set((state) => {
-      const isAlreadySaved = state.savedBookings.some(
-        (saved) => saved.id === booking.id
-      );
-      if (isAlreadySaved) {
-        return state; // Don't add duplicates
-      }
-      return {
-        savedBookings: [...state.savedBookings, booking],
-      };
+  setBookings: (bookings: Reservation[]) => {
+    console.log('📋 [STORE] Setting bookings:', bookings.length);
+    set({
+      bookings: bookings.filter(
+        (booking, index, self) => index === self.findIndex((b) => b.id === booking.id)
+      ),
+      error: null,
     });
   },
 
-  removeSavedBooking: (bookingId) => {
-    set((state) => ({
-      savedBookings: state.savedBookings.filter(
-        (booking) => booking.id !== bookingId
-      ),
-    }));
+  setCurrentBooking: (booking: Reservation | null) => {
+    console.log('🎯 [STORE] Setting current booking:', booking?.id || 'null');
+    set({ currentBooking: booking, error: null });
   },
 
-  isBookingSaved: (bookingId) => {
-    const { savedBookings } = get();
-    return savedBookings.some((booking) => booking.id === bookingId);
+  setLoading: (loading: boolean) => {
+    console.log('⏳ [STORE] Setting loading state:', loading);
+    set({ loading, error: null });
+  },
+
+  setError: (error: string | null) => {
+    console.log('❌ [STORE] Setting error:', error);
+    set({ error });
   },
 }));

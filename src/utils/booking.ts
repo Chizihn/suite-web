@@ -7,43 +7,31 @@ export const formatDate = (date: Date): string => {
   });
 };
 
+// src/utils/booking.ts
 export const calculateNights = (checkIn: string, checkOut: string): number => {
-  const checkInDate = new Date(checkIn);
-  const checkOutDate = new Date(checkOut);
-  const diffTime = checkOutDate.getTime() - checkInDate.getTime();
+  if (!checkIn || !checkOut) return 0;
+  const start = new Date(checkIn);
+  const end = new Date(checkOut);
+  const diffTime = Math.abs(end.getTime() - start.getTime());
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
 
-// Price utilities
-export const calculateSubtotal = (
-  basePrice: number,
-  nights: number
-): number => {
-  return basePrice * nights;
+export const calculateSubtotal = (pricePerDay: number, nights: number, numRooms: number = 1): number => {
+  if (!pricePerDay || !nights || !numRooms) return 0;
+  return pricePerDay * nights * numRooms;
 };
 
-export const calculateFees = (
-  subtotal: number,
-  feePercentage: number = 0.1
-): number => {
-  return Math.round(subtotal * feePercentage);
+export const calculateFees = (subtotal: number): number => {
+  return subtotal * 0.1; // 10% fees
 };
 
-export const calculateDiscount = (
-  subtotal: number,
-  discountPercentage: number = 0.05
-): number => {
-  return Math.round(subtotal * discountPercentage);
+export const calculateDiscount = (subtotal: number): number => {
+  return subtotal * 0.05; // 5% discount
 };
 
-export const calculateTotal = (
-  subtotal: number,
-  fees: number,
-  discount: number
-): number => {
+export const calculateTotal = (subtotal: number, fees: number, discount: number): number => {
   return subtotal + fees - discount;
 };
-
 // String utilities
 export const truncateAddress = (
   address: string,

@@ -2,12 +2,14 @@ export interface CardProps {
   children: React.ReactNode;
   variant?: "default" | "elevated" | "outlined";
   className?: string;
+  onClick?: () => void;
 }
 
 export const Card: React.FC<CardProps> = ({
   children,
   variant = "default",
   className = "",
+  onClick,
 }) => {
   const base = "rounded-xl p-6 transition-all";
   const variants = {
@@ -17,7 +19,7 @@ export const Card: React.FC<CardProps> = ({
   };
 
   return (
-    <div className={`${base} ${variants[variant]} ${className}`}>
+    <div className={`${base} ${variants[variant]} ${className}`} onClick={onClick}>
       {children}
     </div>
   );

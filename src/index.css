@@ -344,289 +344,337 @@ button:disabled {
 
 /* Suiet package styling */
 
-.wkit-button {
-  background-color: var(--primary);
-  color: var(--background-primary);
-  font-weight: 700;
-  width: auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius);
-  font-size: var(--text-md);
-  line-height: var(--leading-normal);
-  padding: 0.5rem 1rem;
-  transition: all var(--transition);
-  cursor: pointer;
-  border: 1px solid transparent;
-  font-family: inherit;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  position: relative;
-  overflow: hidden;
+/* Dark mode styles for @mysten/dapp-kit - Based on actual DOM structure */
+
+/* Connect Button */
+.Button_buttonVariants__x1s81q0 {
+  background-color: var(--primary) !important;
+  color: var(--background-primary) !important;
+  font-weight: 700 !important;
+  border-radius: var(--radius) !important;
+  font-size: var(--text-md) !important;
+  transition: all var(--transition) !important;
+  border: 1px solid transparent !important;
+  font-family: inherit !important;
 }
 
-.wkit-button:hover {
-  background-color: var(--primary-dark);
+.Button_buttonVariants__x1s81q0:hover {
+  background-color: var(--primary-dark) !important;
 }
 
-/* Overlay */
-.wkit-dialog__overlay {
-  background-color: rgba(10, 15, 15, 0.85) !important; /* matches --background-primary with transparency */
-  backdrop-filter: blur(6px);
+/* Modal Overlay */
+.ConnectModal_overlay__gz8z90 {
+  background-color: rgba(10, 15, 15, 0.85) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
-/* Modal Container */
-.wkit-dialog__content {
-  background-color: var(--surface-primary) !important; /* #1e2727 */
-  color: var(--text-primary) !important; /* #f8fafc */
-  border-radius: var(--radius-lg); /* 1rem */
-  box-shadow: var(--shadow-xl);
-  max-width: 500px;
-  margin: 1rem auto;
-  font-family: var(--font-sans);
-
+/* Modal Content Container */
+.ConnectModal_content__gz8z92 {
+  background-color: var(--surface-primary) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-xl) !important;
+  font-family: var(--font-sans) !important;
+  border: 1px solid var(--border-primary) !important;
 }
 
-
-/* Header */
-.wkit-dialog__header {
-  border-bottom: 1px solid var(--border-primary);
-  padding: var(--space-4);
-  color: var(--text-primary);
-  position: relative;
-  font-weight: 600;
-  font-size: var(--text-lg);
+/* Wallet List Container */
+.ConnectModal_walletListContainer__gz8z99,
+.ConnectModal_walletListContent__gz8z98 {
+  background-color: var(--surface-primary) !important;
+  color: var(--text-primary) !important;
 }
 
-/* Title */
-.wkit-dialog__title {
-  margin: 0;
-  color: var(--text-primary);
+/* Modal Title */
+.ConnectModal_title__gz8z91 {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  margin-bottom: var(--space-4) !important;
 }
 
-.wkit-select__title, .wkit-connecting__description, .wkit-install__description {
-  color: var(--text-secondary);
+/* Wallet List */
+.WalletList_container__1v2s6cz0 {
+  background-color: var(--surface-primary) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  list-style: none !important;
 }
 
-.wkit-select__title:hover {
-  color: var(--text-primary);
+/* Wallet List Item Container */
+.WalletListItem_container__1dqqtqs0 {
+  margin-bottom: 8px !important;
 }
 
-.wkit-select-item, .wkit-connecting__title, .wkit-install__title {
-  color: var(--text-primary);
+.WalletListItem_container__1dqqtqs0:last-child {
+  margin-bottom: 0 !important;
 }
 
-.wkit-install__button {
-  margin-top: 4px;
-}
-/* Connected Wallet Button */
-.wkit-connected-container {
-  font-family: inherit;
-  background: var(--surface-primary);
-padding: 0;
-}
-
-.wkit-connected-button {
-  background: var(--surface-primary);
-  border: 1px solid var(--border-primary);
-  border-radius: 8px;
-  padding: 6px 1px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: var(--text-primary);
+/* Wallet Item Button */
+.WalletListItem_walletItem__1dqqtqs1 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 12px 16px !important;
+  border-radius: var(--radius) !important;
+  background-color: var(--surface-secondary) !important;
+  border: 1px solid var(--border-primary) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  width: 100% !important;
+  text-align: left !important;
 }
 
-.wkit-connected-button:hover {
-  background: var(--surface-hover);
-  border-color: var(--primary);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.WalletListItem_walletItem__1dqqtqs1:hover {
+  background-color: var(--surface-hover) !important;
+  border-color: var(--primary) !important;
+  transform: translateY(-1px) !important;
 }
 
-.wkit-connected-button:active {
-  
-  transform: translateY(0);
-  box-shadow: none;
+/* Wallet Icon */
+.WalletListItem_walletIcon__1dqqtqs3 {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 4px !important;
 }
 
-.wkit-connected-button:hover .wkit-address-select__right-arrow {
-  color: var(--primary);
-  
-  transform: translateX(2px);
+/* Wallet Name - using Heading classes */
+.WalletListItem_walletItem__1dqqtqs1 .Heading__1aa835k0 {
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
 }
 
-.wkit-connected-button:hover .wkit-address-select__address {
-  
-  color: var(--primary);
+.WalletListItem_walletItem__1dqqtqs1:hover .Heading__1aa835k0 {
+  color: var(--primary) !important;
 }
 
-.wkit-connected-button__balance {
-  display: none; /* Hide SUI balance */
+/* "What is a Wallet" Button */
+.ConnectModal_whatIsAWalletButton__gz8z93 {
+  background-color: transparent !important;
+  color: var(--text-secondary) !important;
+  border: none !important;
+  cursor: pointer !important;
+  font-size: var(--text-sm) !important;
+  text-decoration: underline !important;
+  transition: color var(--transition) !important;
 }
 
-.wkit-connected-button__divider {
-  display: none; /* Hide divider since we're hiding balance */
+.ConnectModal_whatIsAWalletButton__gz8z93:hover {
+  color: var(--primary) !important;
 }
 
-.wkit-address-select {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+/* View Container (What is a Wallet page) */
+.ConnectModal_viewContainer__gz8z94 {
+  background-color: var(--surface-primary) !important;
+  color: var(--text-primary) !important;
 }
 
-.wkit-address-select__address {
-  font-size: 0.875rem;
-  color: var(--text-primary);
-  font-weight: 500;
+/* Back Button Container */
+.ConnectModal_backButtonContainer__gz8z96 {
+  background-color: var(--surface-primary) !important;
 }
 
-.wkit-address-select__right-arrow {
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
+/* Icon Buttons (Back and Close) */
+.IconButton_container__s6n7bq0 {
+  background-color: transparent !important;
+  color: var(--text-secondary) !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: color var(--transition) !important;
+  padding: 8px !important;
+  border-radius: var(--radius) !important;
 }
 
-.wkit-address-select__right-arrow svg {
-  width: 16px;
-  height: 16px;
-}
-
-.wkit-select-item:hover {
-  color: var(--primary);
-}
-
-.wkit-new-to-sui {
-  background-color: var(--background-primary);
-  color: var(--text-primary);
-}
-.wkit-new-to-sui__text {
-  color: var(--text-tertiary);
-}
-
-.wkit-new-to-sui__link {
-  color: var(--primary);
-}
-.wkit-new-to-sui__link:hover {
-  color: var(--primary-dark);
+.IconButton_container__s6n7bq0:hover {
+  color: var(--primary) !important;
+  background-color: var(--surface-secondary) !important;
 }
 
 /* Close Button */
-.wkit-dialog__close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-  color: var(--text-primary);
-  transition: color var(--transition);
+.ConnectModal_closeButtonContainer__gz8z97 {
+  position: absolute !important;
+  top: 16px !important;
+  right: 16px !important;
 }
 
-.wkit-dialog__close:hover svg path {
-  stroke: var(--primary);
+/* What is a Wallet Content */
+.WhatIsAWallet_container__1ktpkq90 {
+  background-color: var(--surface-primary) !important;
+  color: var(--text-primary) !important;
+  padding: var(--space-6) !important;
 }
 
-/* Account Modal Content */
-.wkit-account-modal__content {
-  padding: var(--space-4);
-  background-color: var(--surface-primary); /* #2a3636 */
-  border-radius: var(--radius-lg);
-  color: var(--text-secondary);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
+.WhatIsAWallet_content__1ktpkq91 {
+  background-color: var(--surface-primary) !important;
 }
 
-/* Account name */
-.wkit-account-modal__name {
-  color: var(--text-primary);
-  font-weight: 600;
-  font-family: var(--font-display);
-  font-size: var(--text-lg);
-  margin-bottom: var(--space-4);
-  user-select: text;
+/* Info Sections */
+.InfoSection_container__1wtioi70 {
+  background-color: var(--surface-secondary) !important;
+  padding: var(--space-4) !important;
+  border-radius: var(--radius) !important;
+  margin-bottom: var(--space-4) !important;
+  border: 1px solid var(--border-primary) !important;
 }
 
-/* Buttons */
-.wkit-account-modal__action-button {
-  display: block;
-  width: 100%;
-  background-color: var(--surface-tertiary); /* #374242 */
-  color: var(--text-primary);
-  border-radius: var(--radius);
-  border: none;
-  /* padding: var(--space-3) var(--space-4); */
-  font-weight: 600;
-  font-size: var(--text-sm);
-  margin-bottom: var(--space-3);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  cursor: pointer;
-  transition: background-color var(--transition);
+.InfoSection_container__1wtioi70:last-child {
+  margin-bottom: 0 !important;
 }
 
-.wkit-account-modal__action-button:hover {
-  background-color: var(--primary);
-  color: var(--background-primary);
+/* All Headings */
+.Heading__1aa835k0 {
+  color: var(--text-primary) !important;
 }
 
-.wkit-account-modal__action-button svg path {
-  stroke: currentColor;
+/* Text Elements */
+.Text__2bv1ur0 {
+  color: var(--text-secondary) !important;
 }
 
-/* Disconnect Button */
-.wkit-account-modal__action-button--disconnect {
-  background-color: var(--error); /* #ef4444 */
-  color: var(--background-primary);
+/* Muted Text */
+.Text_textVariants_color_muted__2bv1ur5 {
+  color: var(--text-tertiary) !important;
 }
 
-.wkit-account-modal__action-button--disconnect:hover {
-  background-color: #b02a2a; /* darker red */
-  color: var(--text-primary);
+/* Connected Account Button */
+.AccountDropdownMenu_connectedAccount__div2ql0 {
+  background-color: var(--surface-primary) !important;
+  border: 1px solid var(--border-primary) !important;
+  border-radius: var(--radius) !important;
+  padding: 8px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  color: var(--text-primary) !important;
 }
 
-/* Button text */
-.wkit-account-modal__action-button-text {
-  flex: 1;
-  text-align: center;
-  color: inherit;
-  font-weight: 600;
+.AccountDropdownMenu_connectedAccount__div2ql0:hover {
+  background-color: var(--surface-hover) !important;
+  border-color: var(--primary) !important;
+  transform: translateY(-1px) !important;
 }
 
-.wkit-select__scroll {
-  max-height: 300px; /* or your desired height */
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  /* For Firefox */
-  scrollbar-width: thin;
-  scrollbar-color: var(--primary) var(--surface-secondary);
+/* Connected Account Address Text */
+.AccountDropdownMenu_connectedAccount__div2ql0 .Text__2bv1ur0 {
+  color: var(--text-primary) !important;
+  font-family: var(--font-mono) !important;
 }
 
-/* For WebKit browsers (Chrome, Safari, Edge) */
-.wkit-select__scroll::-webkit-scrollbar {
+.AccountDropdownMenu_connectedAccount__div2ql0:hover .Text__2bv1ur0 {
+  color: var(--primary) !important;
+}
+
+/* Dropdown Arrow */
+.AccountDropdownMenu_connectedAccount__div2ql0 svg path {
+  stroke: var(--text-secondary) !important;
+}
+
+.AccountDropdownMenu_connectedAccount__div2ql0:hover svg path {
+  stroke: var(--primary) !important;
+}
+
+/* Dropdown Menu Container */
+.AccountDropdownMenu_menuContainer__div2ql1 {
+  background-color: var(--surface-primary) !important;
+  border: 1px solid var(--border-primary) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-xl) !important;
+  padding: 8px !important;
+  min-width: 180px !important;
+}
+
+/* Dropdown Menu Content */
+.AccountDropdownMenu_menuContent__div2ql2 {
+  background-color: var(--surface-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Menu Items */
+.AccountDropdownMenu_menuItem__div2ql3 {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 8px 12px !important;
+  border-radius: var(--radius) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  color: var(--text-primary) !important;
+  font-size: var(--text-sm) !important;
+  font-weight: 500 !important;
+}
+
+.AccountDropdownMenu_menuItem__div2ql3:hover {
+  background-color: var(--surface-secondary) !important;
+  color: var(--primary) !important;
+}
+
+/* Switch Account Menu Item */
+.AccountDropdownMenu_switchAccountMenuItem__div2ql4 {
+  background-color: var(--surface-secondary) !important;
+  border: 1px solid var(--border-primary) !important;
+  margin-bottom: 4px !important;
+}
+
+.AccountDropdownMenu_switchAccountMenuItem__div2ql4:hover {
+  background-color: var(--surface-hover) !important;
+  border-color: var(--primary) !important;
+}
+
+/* Current Account Address in Dropdown */
+.AccountDropdownMenu_switchAccountMenuItem__div2ql4 .Text__2bv1ur0 {
+  color: var(--text-primary) !important;
+  font-family: var(--font-mono) !important;
+}
+
+/* Checkmark Icon */
+.AccountDropdownMenu_switchAccountMenuItem__div2ql4 svg path {
+  fill: var(--primary) !important;
+}
+
+.AccountDropdownMenu_switchAccountMenuItem__div2ql4:hover svg path {
+  fill: var(--primary) !important;
+}
+
+/* Menu Separator */
+.AccountDropdownMenu_separator__div2ql5 {
+  height: 1px !important;
+  background-color: var(--border-primary) !important;
+  margin: 4px 0 !important;
+}
+
+/* Disconnect Menu Item */
+.AccountDropdownMenu_menuItem__div2ql3:last-child {
+  color: var(--error) !important;
+}
+
+.AccountDropdownMenu_menuItem__div2ql3:last-child:hover {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  color: var(--error) !important;
+}
+
+/* General dapp-kit overrides */
+[data-dapp-kit] {
+  font-family: var(--font-sans) !important;
+}
+
+/* Scrollbar for any scrollable content */
+.ConnectModal_content__gz8z92 *::-webkit-scrollbar {
   width: 8px;
 }
 
-.wkit-select__scroll::-webkit-scrollbar-track {
+.ConnectModal_content__gz8z92 *::-webkit-scrollbar-track {
   background: var(--surface-secondary);
   border-radius: 4px;
 }
 
-.wkit-select__scroll::-webkit-scrollbar-thumb {
+.ConnectModal_content__gz8z92 *::-webkit-scrollbar-thumb {
   background-color: var(--primary);
   border-radius: 4px;
-  border: 2px solid var(--surface-secondary); /* gives some padding around thumb */
+  border: 2px solid var(--surface-secondary);
 }
 
-.wkit-select__scroll::-webkit-scrollbar-thumb:hover {
+.ConnectModal_content__gz8z92 *::-webkit-scrollbar-thumb:hover {
   background-color: var(--primary-dark);
 }

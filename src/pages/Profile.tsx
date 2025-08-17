@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Wallet,  
-  LogOut, 
   User, 
   ChevronRight, 
   Copy, 
@@ -19,7 +18,7 @@ import { Button } from "../components/ui/Button";
 import ConnectWallet from "../components/ConnectWallet";
 
 const Profile: React.FC = () => {
-  const { address, isConnected, disconnect, getBalance } = useWallet();
+  const { address, isConnected, getBalance } = useWallet();
   const navigate = useNavigate();
   const [balance, setBalance] = useState<string>("0");
   const [showBalance, setShowBalance] = useState<boolean>(false);
@@ -51,10 +50,6 @@ const Profile: React.FC = () => {
     return () => clearInterval(interval);
   }, [isConnected, getBalance]);
 
-  const handleDisconnect = () => {
-    disconnect();
-    navigate("/");
-  };
 
   const copyAddress = () => {
     if (address) {
@@ -272,17 +267,7 @@ const Profile: React.FC = () => {
                     </div>
                     <ChevronRight size={16} style={{ color: 'var(--text-tertiary)' }} />
                   </Button>
-                  <Button
-                    variant="danger"
-                    className="w-full py-3 flex items-center justify-between"
-                    onClick={handleDisconnect}
-                  >
-                    <div className="flex items-center gap-2">
-                      <LogOut size={16} style={{ color: 'var(--error)' }} />
-                      <span>Disconnect Wallet</span>
-                    </div>
-                    <ChevronRight size={16} style={{ color: 'var(--text-tertiary)' }} />
-                  </Button>
+                 
                 </div>
               </div>
             </div>

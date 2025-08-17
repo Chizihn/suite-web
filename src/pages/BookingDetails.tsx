@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
   Loader2,
   CheckCircle,
   Calendar,
   Clock,
-  Users,
   Bed,
   ExternalLink,
   Download,
@@ -16,31 +15,36 @@ import {
   Wallet,
   Shield,
   Award,
-} from "lucide-react";
-import { useBookingStore } from "../store/bookingStore";
-import { Button } from "../components/ui/Button";
-import { Modal } from "../components/ui/Modal";
+} from 'lucide-react';
+import { useBookingStore } from '../store/bookingStore';
+import { Button } from '../components/ui/Button';
+import { Modal } from '../components/ui/Modal';
+import { useWallet } from '../contexts/WalletContext';
+import { useReservations } from '../hooks/useQuery';
+import { calculateNights } from '../utils/booking';
 
 const BookingDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { address } = useWallet();
   const navigate = useNavigate();
-  const { bookings, fetchBookings, loading, setCurrentBooking } = useBookingStore();
+  const { bookings, setCurrentBooking, loading, error } = useBookingStore();
+  const { data: reservations, isLoading: reservationsLoading } = useReservations(address as string);
+  const [showCancelModal, setShowCancelModal] = React.useState(false);
+  const [showNFTModal, setShowNFTModal] = React.useState(false);
+
   const booking = bookings.find((b) => b.id === id);
-  
-  const [showCancelModal, setShowCancelModal] = useState(false);
-  const [showNFTModal, setShowNFTModal] = useState(false);
 
   useEffect(() => {
-    if (!bookings.length) {
-      fetchBookings();
+    if (reservations && !reservationsLoading) {
+      // Store is updated via useReservations hook
     }
-  }, []);
+  }, [reservations, reservationsLoading]);
 
   useEffect(() => {
     if (booking) {
       setCurrentBooking(booking);
     }
-  }, [booking]);
+  }, [booking, setCurrentBooking]);
 
   const handleGoBack = () => {
     navigate(-1);
@@ -71,15 +75,12 @@ const BookingDetails: React.FC = () => {
   };
 
   const handleDownloadReceipt = () => {
-    console.log("Download receipt");
+    console.log('Download receipt');
   };
 
-  if (loading || !booking) {
+  if (loading || reservationsLoading || !booking) {
     return (
-      <div 
-        className="min-h-screen flex items-center justify-center" 
-        style={{ backgroundColor: 'var(--background-primary)' }}
-      >
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--background-primary)' }}>
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-12 w-12 animate-spin" style={{ color: 'var(--primary)' }} />
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Loading booking details...</p>
@@ -88,16 +89,21 @@ const BookingDetails: React.FC = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--background-primary)' }}>
+        <div className="text-center p-6 max-w-md">
+          <h2 className="text-2xl font-bold mb-4">Error Loading Booking</h2>
+          <p className="mb-6">{error}</p>
+          <Button onClick={() => navigate('/bookings')}>Back to Bookings</Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--background-primary)' }}>
-      {/* Header */}
-      <div 
-        className="sticky top-0 z-40 border-b" 
-        style={{ 
-          backgroundColor: 'var(--surface-primary)', 
-          borderColor: 'var(--border-primary)' 
-        }}
-      >
+      <div className="sticky top-0 z-40 border-b" style={{ backgroundColor: 'var(--surface-primary)', borderColor: 'var(--border-primary)' }}>
         <div className="p-3">
           <div className="flex items-center justify-between h-16 px-2">
             <div className="flex items-center gap-4">
@@ -109,14 +115,10 @@ const BookingDetails: React.FC = () => {
               >
                 <ArrowLeft size={20} style={{ color: 'var(--text-primary)' }} />
               </button>
-              <h1 
-                className="text-lg lg:text-2xl font-semibold"
-                style={{ color: 'var(--text-primary)' }}
-              >
+              <h1 className="text-lg lg:text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
                 Booking Confirmed
               </h1>
             </div>
-            
             <div className="flex items-center gap-2">
               <button
                 onClick={handleShare}
@@ -139,93 +141,34 @@ const BookingDetails: React.FC = () => {
         </div>
       </div>
 
-      {/* <div className="pb-24 md:pb-8"> */}
       <div className="">
-
-        {/* Success Banner */}
-        {/* <div 
-          className="mx-4 mt-6 p-6 rounded-xl border text-center"
-          style={{ 
-            backgroundColor: 'var(--success-light)',
-            borderColor: 'var(--success)',
-          }}
-        >
-          <div className="flex justify-center mb-4">
-            <div 
-              className="p-3 rounded-full"
-              style={{ backgroundColor: 'var(--success)' }}
-            >
-              <CheckCircle size={32} color="white" />
-            </div>
-          </div>
-          <h2 
-            className="text-2xl font-bold mb-2"
-            style={{ color: 'var(--success)' }}
-          >
-            Booking Confirmed!
-          </h2>
-          <p 
-            className="text-sm max-w-md mx-auto"
-            style={{ color: 'var(--text-secondary)' }}
-          >
-            Your reservation at {booking.hotelName} has been successfully confirmed and secured on the blockchain.
-          </p>
-        </div> */}
-
         <div className="mt-2 lg:grid lg:grid-cols-3 lg:gap-8">
-          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            
-        {/* Success Banner */}
-          <div 
-          className="p-6 rounded-xl border text-center"
-          style={{ 
-            backgroundColor: 'var(--success-light)',
-            borderColor: 'var(--success)',
-          }}
-        >
-          <div className="flex justify-center mb-4">
-            <div 
-              className="p-3 rounded-full"
-              style={{ backgroundColor: 'var(--success)' }}
-            >
-              <CheckCircle size={32} color="white" />
+            <div className="p-6 rounded-xl border text-center" style={{ backgroundColor: 'var(--success-light)', borderColor: 'var(--success)' }}>
+              <div className="flex justify-center mb-4">
+                <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--success)' }}>
+                  <CheckCircle size={32} color="white" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--success)' }}>
+                Booking Confirmed!
+              </h2>
+              <p className="text-sm max-w-md mx-auto" style={{ color: 'var(--text-secondary)' }}>
+                Your reservation at {booking.hotelName} has been successfully confirmed and secured on the blockchain.
+              </p>
             </div>
-          </div>
-          <h2 
-            className="text-2xl font-bold mb-2"
-            style={{ color: 'var(--success)' }}
-          >
-            Booking Confirmed!
-          </h2>
-          <p 
-            className="text-sm max-w-md mx-auto"
-            style={{ color: 'var(--text-secondary)' }}
-          >
-            Your reservation at {booking.hotelName} has been successfully confirmed and secured on the blockchain.
-          </p>
-        </div>
-            {/* Hotel Information */}
-            <div 
-              className="mx-4 lg:mx-0 rounded-xl p-6 shadow-sm border"
-              style={{ 
-                backgroundColor: 'var(--surface-primary)', 
-                borderColor: 'var(--border-primary)' 
-              }}
-            >
+
+            <div className="mx-4 lg:mx-0 rounded-xl p-6 shadow-sm border" style={{ backgroundColor: 'var(--surface-primary)', borderColor: 'var(--border-primary)' }}>
               <div className="flex items-start gap-4 mb-4">
-                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                {/* <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                   <img
-                    src={booking.hotelImage}
+                    src={booking.hotelImage || 'https://via.placeholder.com/100'}
                     alt={booking.hotelName}
                     className="w-full h-full object-cover"
                   />
-                </div>
+                </div> */}
                 <div className="flex-1">
-                  <h3 
-                    className="text-xl font-bold mb-1"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
+                  <h3 className="text-xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>
                     {booking.hotelName}
                   </h3>
                   <div className="flex items-center mb-2" style={{ color: 'var(--text-secondary)' }}>
@@ -238,80 +181,49 @@ const BookingDetails: React.FC = () => {
                     <span className="text-sm ml-1" style={{ color: 'var(--text-tertiary)' }}>(128 reviews)</span>
                   </div>
                 </div>
-                <div 
-                  className="px-3 py-1 rounded-full text-xs font-medium"
-                  style={{ 
-                    backgroundColor: 'var(--success-light)',
-                    color: 'var(--success)'
-                  }}
-                >
-                  {booking.status}
+                <div className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--success-light)', color: 'var(--success)' }}>
+                  {booking.isActive ? 'Confirmed' : 'Cancelled'}
                 </div>
               </div>
             </div>
 
-            {/* Booking Details */}
-            <div 
-              className="mx-4 lg:mx-0 rounded-xl p-6 shadow-sm border"
-              style={{ 
-                backgroundColor: 'var(--surface-primary)', 
-                borderColor: 'var(--border-primary)' 
-              }}
-            >
-              <h3 
-                className="text-lg font-bold mb-6"
-                style={{ color: 'var(--text-primary)' }}
-              >
+            <div className="mx-4 lg:mx-0 rounded-xl p-6 shadow-sm border" style={{ backgroundColor: 'var(--surface-primary)', borderColor: 'var(--border-primary)' }}>
+              <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
                 Reservation Details
               </h3>
-              
               <div className="grid grid-cols-2 gap-6 mb-6">
                 <DetailCard
                   icon={<Calendar size={20} />}
                   label="Check-in"
-                  value={booking.checkIn}
+                  value={new Date(booking.startDate * 1000).toISOString().split('T')[0]}
                   subtitle="After 3:00 PM"
                 />
                 <DetailCard
                   icon={<Clock size={20} />}
                   label="Check-out"
-                  value={booking.checkOut}
+                  value={new Date(booking.endDate * 1000).toISOString().split('T')[0]}
                   subtitle="Before 11:00 AM"
                 />
-                <DetailCard
+                {/* <DetailCard
                   icon={<Users size={20} />}
                   label="Guests"
                   value={`${booking.guests} Guest${booking.guests > 1 ? 's' : ''}`}
-                  subtitle={`${booking.nights} Night${booking.nights > 1 ? 's' : ''}`}
-                />
+                  subtitle={`${calculateNights(new Date(booking.startDate * 1000).toISOString(), new Date(booking.endDate * 1000).toISOString())} Night${calculateNights(new Date(booking.startDate * 1000).toISOString(), new Date(booking.endDate * 1000).toISOString()) > 1 ? 's' : ''}`}
+                /> */}
                 <DetailCard
                   icon={<Bed size={20} />}
-                  label="Room Type"
-                  value={booking.roomType}
+                  label="Room"
+                  value={`Room ${booking.roomId.slice(0, 6)}...`}
                   subtitle="Premium Suite"
                 />
               </div>
-
-              {/* Booking ID */}
-              <div 
-                className="p-4 rounded-lg border"
-                style={{ 
-                  backgroundColor: 'var(--surface-secondary)',
-                  borderColor: 'var(--border-primary)'
-                }}
-              >
+              <div className="p-4 rounded-lg border" style={{ backgroundColor: 'var(--surface-secondary)', borderColor: 'var(--border-primary)' }}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p 
-                      className="text-sm font-medium mb-1"
-                      style={{ color: 'var(--text-primary)' }}
-                    >
+                    <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
                       Booking Reference
                     </p>
-                    <p 
-                      className="text-xs font-mono"
-                      style={{ color: 'var(--text-secondary)' }}
-                    >
+                    <p className="text-xs font-mono" style={{ color: 'var(--text-secondary)' }}>
                       {booking.id}
                     </p>
                   </div>
@@ -322,76 +234,43 @@ const BookingDetails: React.FC = () => {
               </div>
             </div>
 
-            {/* Mobile Payment Summary - Only show on mobile */}
-            <div 
-              className="mx-4 lg:hidden rounded-xl p-6 shadow-sm border"
-              style={{ 
-                backgroundColor: 'var(--surface-primary)', 
-                borderColor: 'var(--border-primary)' 
-              }}
-            >
-              <h3 
-                className="text-lg font-bold mb-6"
-                style={{ color: 'var(--text-primary)' }}
-              >
+            <div className="mx-4 lg:hidden rounded-xl p-6 shadow-sm border" style={{ backgroundColor: 'var(--surface-primary)', borderColor: 'var(--border-primary)' }}>
+              <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
                 Payment Summary
               </h3>
-              
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span style={{ color: 'var(--text-secondary)' }}>Room Rate ({booking.nights} nights)</span>
-                  <span style={{ color: 'var(--text-primary)' }}>{(booking.totalPrice * 0.9).toFixed(1)} SUI</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>Room Rate ({calculateNights(new Date(booking.startDate * 1000).toISOString(), new Date(booking.endDate * 1000).toISOString())} nights)</span>
+                  <span style={{ color: 'var(--text-primary)' }}>{(booking.totalCost * 0.8).toFixed(1)} SUI</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span style={{ color: 'var(--text-secondary)' }}>Service Fee</span>
+                  <span style={{ color: 'var(--text-primary)' }}>{(booking.totalCost * 0.1).toFixed(1)} SUI</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span style={{ color: 'var(--text-secondary)' }}>Taxes & Fees</span>
-                  <span style={{ color: 'var(--text-primary)' }}>{(booking.totalPrice * 0.1).toFixed(1)} SUI</span>
+                  <span style={{ color: 'var(--text-primary)' }}>{(booking.totalCost * 0.1).toFixed(1)} SUI</span>
                 </div>
-                <div 
-                  className="flex justify-between items-center pt-4 border-t"
-                  style={{ borderColor: 'var(--border-primary)' }}
-                >
-                  <span 
-                    className="text-lg font-bold"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
+                <div className="flex justify-between items-center pt-4 border-t" style={{ borderColor: 'var(--border-primary)' }}>
+                  <span className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
                     Total Paid
                   </span>
-                  <span 
-                    className="text-xl font-bold"
-                    style={{ color: 'var(--primary)' }}
-                  >
-                    {booking.totalPrice} SUI
+                  <span className="text-xl font-bold" style={{ color: 'var(--primary)' }}>
+                    {booking.totalCost} SUI
                   </span>
                 </div>
-                <p 
-                  className="text-xs text-center pt-2"
-                  style={{ color: 'var(--text-tertiary)' }}
-                >
+                <p className="text-xs text-center pt-2" style={{ color: 'var(--text-tertiary)' }}>
                   Payment processed via Sui blockchain
                 </p>
               </div>
             </div>
 
-            {/* Mobile NFT & Blockchain Info - Only show on mobile */}
-            <div 
-              className="mx-4 lg:hidden rounded-xl p-6 shadow-sm border"
-              style={{ 
-                backgroundColor: 'var(--surface-primary)', 
-                borderColor: 'var(--border-primary)' 
-              }}
-            >
-              <h3 
-                className="text-lg font-bold mb-6"
-                style={{ color: 'var(--text-primary)' }}
-              >
+            <div className="mx-4 lg:hidden rounded-xl p-6 shadow-sm border" style={{ backgroundColor: 'var(--surface-primary)', borderColor: 'var(--border-primary)' }}>
+              <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
                 Blockchain Verification
               </h3>
-              
               <div className="space-y-4">
-                <div className="flex items-center p-4 rounded-lg border" style={{ 
-                  backgroundColor: 'var(--surface-secondary)', 
-                  borderColor: 'var(--border-primary)' 
-                }}>
+                <div className="flex items-center p-4 rounded-lg border" style={{ backgroundColor: 'var(--surface-secondary)', borderColor: 'var(--border-primary)' }}>
                   <Wallet className="w-6 h-6 mr-3" style={{ color: 'var(--primary)' }} />
                   <div className="flex-1">
                     <p className="font-medium" style={{ color: 'var(--text-primary)' }}>Booking NFT</p>
@@ -404,22 +283,14 @@ const BookingDetails: React.FC = () => {
                     View NFT
                   </Button>
                 </div>
-                
-                <div className="flex items-center p-4 rounded-lg border" style={{ 
-                  backgroundColor: 'var(--surface-secondary)', 
-                  borderColor: 'var(--border-primary)' 
-                }}>
+                <div className="flex items-center p-4 rounded-lg border" style={{ backgroundColor: 'var(--surface-secondary)', borderColor: 'var(--border-primary)' }}>
                   <Shield className="w-6 h-6 mr-3" style={{ color: 'var(--success)' }} />
                   <div>
                     <p className="font-medium" style={{ color: 'var(--text-primary)' }}>Verified on Sui</p>
                     <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Immutable booking record</p>
                   </div>
                 </div>
-                
-                <div className="flex items-center p-4 rounded-lg border" style={{ 
-                  backgroundColor: 'var(--surface-secondary)', 
-                  borderColor: 'var(--border-primary)' 
-                }}>
+                <div className="flex items-center p-4 rounded-lg border" style={{ backgroundColor: 'var(--surface-secondary)', borderColor: 'var(--border-primary)' }}>
                   <Award className="w-6 h-6 mr-3" style={{ color: 'var(--warning)' }} />
                   <div>
                     <p className="font-medium" style={{ color: 'var(--text-primary)' }}>Fraud Protected</p>
@@ -430,90 +301,51 @@ const BookingDetails: React.FC = () => {
             </div>
           </div>
 
-          {/* Sticky Sidebar - Desktop Only */}
           <div className="lg:col-span-1 mt-8 lg:mt-0">
             <div className="sticky top-24 space-y-6 hidden lg:block">
-              {/* Payment Summary */}
-              <div 
-                className="rounded-xl p-6 shadow-lg border"
-                style={{ 
-                  backgroundColor: 'var(--surface-primary)', 
-                  borderColor: 'var(--border-primary)' 
-                }}
-              >
-                <h3 
-                  className="text-lg font-bold mb-6"
-                  style={{ color: 'var(--text-primary)' }}
-                >
+              <div className="rounded-xl p-6 shadow-lg border" style={{ backgroundColor: 'var(--surface-primary)', borderColor: 'var(--border-primary)' }}>
+                <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
                   Payment Summary
                 </h3>
-                
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span style={{ color: 'var(--text-secondary)' }}>Room Rate ({booking.nights} nights)</span>
-                    <span style={{ color: 'var(--text-primary)' }}>{(booking.totalPrice * 0.8).toFixed(1)} SUI</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>Room Rate ({calculateNights(new Date(booking.startDate * 1000).toISOString(), new Date(booking.endDate * 1000).toISOString())} nights)</span>
+                    <span style={{ color: 'var(--text-primary)' }}>{(booking.totalCost * 0.8).toFixed(1)} SUI</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span style={{ color: 'var(--text-secondary)' }}>Service Fee</span>
-                    <span style={{ color: 'var(--text-primary)' }}>{(booking.totalPrice * 0.1).toFixed(1)} SUI</span>
+                    <span style={{ color: 'var(--text-primary)' }}>{(booking.totalCost * 0.1).toFixed(1)} SUI</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span style={{ color: 'var(--text-secondary)' }}>Taxes & Fees</span>
-                    <span style={{ color: 'var(--text-primary)' }}>{(booking.totalPrice * 0.1).toFixed(1)} SUI</span>
+                    <span style={{ color: 'var(--text-primary)' }}>{(booking.totalCost * 0.1).toFixed(1)} SUI</span>
                   </div>
-                  <div 
-                    className="flex justify-between items-center pt-4 border-t"
-                    style={{ borderColor: 'var(--border-primary)' }}
-                  >
-                    <span 
-                      className="text-lg font-bold"
-                      style={{ color: 'var(--text-primary)' }}
-                    >
+                  <div className="flex justify-between items-center pt-4 border-t" style={{ borderColor: 'var(--border-primary)' }}>
+                    <span className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
                       Total Paid
                     </span>
-                    <span 
-                      className="text-xl font-bold"
-                      style={{ color: 'var(--primary)' }}
-                    >
-                      {booking.totalPrice} SUI
+                    <span className="text-xl font-bold" style={{ color: 'var(--primary)' }}>
+                      {booking.totalCost} SUI
                     </span>
                   </div>
-                  <p 
-                    className="text-xs text-center pt-2"
-                    style={{ color: 'var(--text-tertiary)' }}
-                  >
+                  <p className="text-xs text-center pt-2" style={{ color: 'var(--text-tertiary)' }}>
                     Payment processed via Sui blockchain
                   </p>
                 </div>
               </div>
 
-              {/* Blockchain Verification */}
-              <div 
-                className="rounded-xl p-6 shadow-lg border"
-                style={{ 
-                  backgroundColor: 'var(--surface-primary)', 
-                  borderColor: 'var(--border-primary)' 
-                }}
-              >
-                <h3 
-                  className="text-lg font-bold mb-6"
-                  style={{ color: 'var(--text-primary)' }}
-                >
+              <div className="rounded-xl p-6 shadow-lg border" style={{ backgroundColor: 'var(--surface-primary)', borderColor: 'var(--border-primary)' }}>
+                <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
                   Blockchain Verification
                 </h3>
-                
                 <div className="space-y-4">
-                  <div className="flex items-center p-4 rounded-lg border" style={{ 
-                    backgroundColor: 'var(--surface-secondary)', 
-                    borderColor: 'var(--border-primary)' 
-                  }}>
+                  <div className="flex items-center p-4 rounded-lg border" style={{ backgroundColor: 'var(--surface-secondary)', borderColor: 'var(--border-primary)' }}>
                     <Wallet className="w-6 h-6 mr-3" style={{ color: 'var(--primary)' }} />
                     <div className="flex-1">
                       <p className="font-medium" style={{ color: 'var(--text-primary)' }}>Booking NFT</p>
                       <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Stored in your wallet</p>
                     </div>
                   </div>
-                  
                   <Button
                     onClick={handleViewNFT}
                     className="w-full py-3 font-medium"
@@ -521,23 +353,15 @@ const BookingDetails: React.FC = () => {
                     <Wallet size={18} className="mr-2" />
                     View NFT
                   </Button>
-                  
                   <div className="space-y-3 pt-4">
-                    <div className="flex items-center p-3 rounded-lg border" style={{ 
-                      backgroundColor: 'var(--surface-secondary)', 
-                      borderColor: 'var(--border-primary)' 
-                    }}>
+                    <div className="flex items-center p-3 rounded-lg border" style={{ backgroundColor: 'var(--surface-secondary)', borderColor: 'var(--border-primary)' }}>
                       <Shield className="w-5 h-5 mr-3" style={{ color: 'var(--success)' }} />
                       <div>
                         <p className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>Verified on Sui</p>
                         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Immutable record</p>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center p-3 rounded-lg border" style={{ 
-                      backgroundColor: 'var(--surface-secondary)', 
-                      borderColor: 'var(--border-primary)' 
-                    }}>
+                    <div className="flex items-center p-3 rounded-lg border" style={{ backgroundColor: 'var(--surface-secondary)', borderColor: 'var(--border-primary)' }}>
                       <Award className="w-5 h-5 mr-3" style={{ color: 'var(--warning)' }} />
                       <div>
                         <p className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>Fraud Protected</p>
@@ -546,23 +370,21 @@ const BookingDetails: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex gap-3 max-w-screen-xl mx-auto">
-          {/* <Button
-            onClick={handleViewNFT}
-            className="flex-1 py-3 font-medium"
-         
-          >
-            <Wallet size={18} className="mr-2" />
-            View NFT
-          </Button> */}
-          <Button
-          variant="danger"
-            onClick={handleCancelBooking}
-            className="flex-1 py-3 font-medium"
-         
-          >
-            Cancel Booking
-          </Button>
-        </div>
+                    <Button
+                      onClick={handleViewNFT}
+                      className="flex-1 py-3 font-medium"
+                    >
+                      <Wallet size={18} className="mr-2" />
+                      View NFT
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={handleCancelBooking}
+                      className="flex-1 py-3 font-medium"
+                    >
+                      Cancel Booking
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -570,9 +392,6 @@ const BookingDetails: React.FC = () => {
         </div>
       </div>
 
- 
-
-      {/* Cancel Booking Modal */}
       <Modal
         isOpen={showCancelModal}
         onClose={() => setShowCancelModal(false)}
@@ -586,17 +405,15 @@ const BookingDetails: React.FC = () => {
             <Button
               onClick={() => setShowCancelModal(false)}
               className="flex-1"
-           
             >
               Keep Booking
             </Button>
             <Button
               onClick={() => {
-                console.log("Booking cancelled");
+                console.log('Booking cancelled');
                 setShowCancelModal(false);
               }}
               className="flex-1"
-           
             >
               Cancel Booking
             </Button>
@@ -604,17 +421,13 @@ const BookingDetails: React.FC = () => {
         </div>
       </Modal>
 
-      {/* NFT Modal */}
       <Modal
         isOpen={showNFTModal}
         onClose={() => setShowNFTModal(false)}
         title="Booking NFT"
       >
         <div className="space-y-4 text-center">
-          <div 
-            className="w-32 h-32 mx-auto rounded-lg border-2 flex items-center justify-center"
-            style={{ borderColor: 'var(--primary)' }}
-          >
+          <div className="w-32 h-32 mx-auto rounded-lg border-2 flex items-center justify-center" style={{ borderColor: 'var(--primary)' }}>
             <Wallet size={48} style={{ color: 'var(--primary)' }} />
           </div>
           <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -638,42 +451,26 @@ const BookingDetails: React.FC = () => {
   );
 };
 
-// Helper component for detail cards
 const DetailCard: React.FC<{
   icon: React.ReactNode;
   label: string;
   value: string;
   subtitle?: string;
 }> = ({ icon, label, value, subtitle }) => (
-  <div 
-    className="p-4 rounded-lg border"
-    style={{ 
-      backgroundColor: 'var(--surface-secondary)',
-      borderColor: 'var(--border-primary)'
-    }}
-  >
+  <div className="p-4 rounded-lg border" style={{ backgroundColor: 'var(--surface-secondary)', borderColor: 'var(--border-primary)' }}>
     <div className="flex items-center mb-2">
       <div style={{ color: 'var(--primary)' }} className="mr-2">
         {icon}
       </div>
-      <span 
-        className="text-sm font-medium"
-        style={{ color: 'var(--text-secondary)' }}
-      >
+      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
         {label}
       </span>
     </div>
-    <p 
-      className="font-bold mb-1"
-      style={{ color: 'var(--text-primary)' }}
-    >
+    <p className="font-bold mb-1" style={{ color: 'var(--text-primary)' }}>
       {value}
     </p>
     {subtitle && (
-      <p 
-        className="text-xs"
-        style={{ color: 'var(--text-tertiary)' }}
-      >
+      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
         {subtitle}
       </p>
     )}

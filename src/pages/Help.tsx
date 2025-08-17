@@ -9,9 +9,7 @@ import {
   MessageCircle,
   Search,
 } from "lucide-react";
-import { useWallet } from "../contexts/WalletContext";
 import { Card } from "../components/ui/Card";
-import { Button } from "../components/ui/Button";
 
 interface TopicCardProps {
   icon: React.ReactNode;
@@ -33,18 +31,13 @@ const TopicCard: React.FC<TopicCardProps> = ({ icon, title, onClick }) => (
 
 const Help: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { isConnected, disconnect } = useWallet();
   const navigate = useNavigate();
 
   const handleGoBack = () => {
     navigate(-1);
   };
 
-  const handleDisconnect = () => {
-    disconnect();
-    navigate("/connect-wallet");
-  };
-
+ 
   const handleTopicPress = (topic: string) => {
     console.log("Topic pressed:", topic);
   };
@@ -136,14 +129,7 @@ const Help: React.FC = () => {
           </Card>
         </div>
 
-        <div className="mt-6">
-          <Button
-            onClick={handleDisconnect}
-            className="w-full bg-surface text-primary rounded-lg py-3 border border-border-primary hover:bg-surface-hover"
-          >
-            Disconnect Wallet
-          </Button>
-        </div>
+      
       </div>
     </div>
   );

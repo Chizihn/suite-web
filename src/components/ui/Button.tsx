@@ -25,7 +25,7 @@ const sizeClasses = {
 const variantClasses = {
   primary: "btn-primary",
   secondary: "bg-gray-600 text-white hover:bg-gray-700",
-  outline: "border border-gray-300 text-gray-700 hover:bg-gray-100",
+  outline: "border border-gray-100 text-gray-700 hover:bg-gray-100",
   ghost: "bg-transparent text-gray-400 hover:bg-gray-200 hover:text-gray-500",
   danger: "bg-red-600 text-white hover:bg-red-700",
 };

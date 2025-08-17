@@ -31,7 +31,7 @@ const Header: React.FC = () => {
     <header 
       className={`sticky top-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'bg-background-primary/95 backdrop-blur-lg border-b border-gray-700  py-2 shadow-lg' 
+          ? 'bg-background-primary/80 backdrop-blur-xl border-b border-gray-700  py-2 shadow-lg' 
           : 'bg-background-primary/5 backdrop-blur-lg border-b border-gray-800 py-3'
       }`}
     >
@@ -46,23 +46,24 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-4">
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                end
-                className={({ isActive }) =>
-                  `px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
-                    isActive 
-                      ? 'text-[var(--primary)]' 
-                      : 'text-[var(--text-primary)] dark:text-gray-300 hover:text-[var(--primary)] dark:hover:text-[var(--primary-light)]'
-                  }`
-                }
-              >
-                {link.icon}
-                <span>{link.label} </span>
-              </NavLink>
-            ))}
+          {navLinks.map((link) => (
+  <NavLink
+    key={link.to}
+    to={link.to}
+    end={link.to === '/'} // only exact match for home/dashboard
+    className={({ isActive }) =>
+      `px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
+        isActive
+          ? 'text-[var(--primary)]'
+          : 'text-[var(--text-primary)] dark:text-gray-300 hover:text-[var(--primary)] dark:hover:text-[var(--primary-light)]'
+      }`
+    }
+  >
+    {link.icon}
+    <span>{link.label}</span>
+  </NavLink>
+))}
+
           </nav>
 
           {/* Wallet Section */}

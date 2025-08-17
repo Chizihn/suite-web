@@ -17,15 +17,25 @@ import Explore from "./pages/Explore";
 import { WalletContextProvider } from "./contexts/WalletContext";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./libs/queryClient";
+import { getFullnodeUrl } from "@mysten/sui/client";
+import { SuiClientProvider } from "@mysten/dapp-kit";
+import CreateHotel from "./pages/CreateHotel";
+
+const networks = {
+  devnet: { url: getFullnodeUrl('devnet') },
+  mainnet: { url: getFullnodeUrl('mainnet') },
+  testnet: { url: getFullnodeUrl('testnet') }, // add as needed
+};
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   
   <React.StrictMode>
     
-   <QueryClientProvider client={queryClient}>
-   <WalletContextProvider>
-      <BrowserRouter>
-        <Routes>
+    <QueryClientProvider client={queryClient}>
+      <SuiClientProvider networks={networks} defaultNetwork="testnet">
+        <WalletContextProvider>
+          <BrowserRouter>
+          <Routes>
           <Route path="/" element={<App />}>
             <Route index element={<Home />} />
             <Route path="explore" element={<Explore />} />
@@ -34,14 +44,16 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="hotels" element={<Hotels />} />
             <Route path="hotels/:id" element={<HotelDetails />} />
             <Route path="hotels/:id/book" element={<BookSuite />} />
+            <Route path="create-hotel" element={<CreateHotel />} />
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />
             <Route path="help" element={<Help />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
-      </BrowserRouter>
-    </WalletContextProvider>
-   </QueryClientProvider>
+          </BrowserRouter>
+        </WalletContextProvider>
+      </SuiClientProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );

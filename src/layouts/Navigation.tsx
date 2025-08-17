@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Search, Book, User } from 'lucide-react';
+import { Home, Search, Book, User, Building } from 'lucide-react';
 
 const Navigation: React.FC = () => {
   const location = useLocation();
@@ -20,6 +20,8 @@ const Navigation: React.FC = () => {
     { to: '/explore', label: 'Explore', icon: <Search size={26} /> },
     { to: '/bookings', label: 'Bookings', icon: <Book size={26} /> },
     { to: '/profile', label: 'Profile', icon: <User size={26} /> },
+    { to: '/create-hotel', label: 'Create hotel', icon: <Building size={26} /> },
+
   ];
 
   return (
